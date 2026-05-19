@@ -1,0 +1,16 @@
+services:
+    flowise:
+        image: flowiseai/flowise:3.1.2
+        container_name: agenthub-flowise
+        restart: unless-stopped
+        env_file:
+            - .env
+        ports:
+            - '127.0.0.1:${PORT:-3000}:${PORT:-3000}'
+        volumes:
+            - agenthub-flowise-data:/root/.flowise
+        entrypoint: flowise start
+
+volumes:
+    agenthub-flowise-data:
+        external: true
