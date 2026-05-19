@@ -9,8 +9,30 @@ services:
             - '127.0.0.1:${PORT:-3000}:${PORT:-3000}'
         volumes:
             - agenthub-flowise-data:/root/.flowise
+        depends_on:
+            postgres:
+                condition: service_healthy
         entrypoint: flowise start
+
+    postgres:
+        image: postgres:16-alpine
+        container_name: agenthub-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: testuser
+            POSTGRES_PASSWORD: testpwd
+            POSTGRES_DB: abudhabi
+        ports:
+            - '127.0.0.1:5555:5432'
+        volumes:
+            - agenthub-postgres-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U testuser -d abudhabi']
+            interval: 5s
+            timeout: 5s
+            retries: 10
 
 volumes:
     agenthub-flowise-data:
         external: true
+    agenthub-postgres-data:
