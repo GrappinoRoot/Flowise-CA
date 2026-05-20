@@ -209,7 +209,7 @@
             "data": {
                 "id": "llmAgentflow_0",
                 "label": "Strutured Output",
-                "version": 1,
+                "version": 1.1,
                 "name": "llmAgentflow",
                 "type": "LLM",
                 "color": "#64B5F6",
