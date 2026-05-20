@@ -1,0 +1,579 @@
+{
+  "nodes": [
+    {
+      "id": "startAgentflow_0",
+      "type": "agentFlow",
+      "position": {
+        "x": -170,
+        "y": 120
+      },
+      "data": {
+        "id": "startAgentflow_0",
+        "label": "Start",
+        "version": 1.1,
+        "name": "startAgentflow",
+        "type": "Start",
+        "color": "#7EE787",
+        "hideInput": true,
+        "baseClasses": [
+          "Start"
+        ],
+        "category": "Agent Flows",
+        "description": "Starting point of the agentflow",
+        "inputParams": [
+          {
+            "label": "Input Type",
+            "name": "startInputType",
+            "type": "options",
+            "options": [
+              {
+                "label": "Chat Input",
+                "name": "chatInput",
+                "description": "Start the conversation with chat input"
+              },
+              {
+                "label": "Form Input",
+                "name": "formInput",
+                "description": "Start the workflow with form inputs"
+              }
+            ],
+            "default": "chatInput",
+            "id": "startAgentflow_0-input-startInputType-options",
+            "display": true
+          },
+          {
+            "label": "Form Title",
+            "name": "formTitle",
+            "type": "string",
+            "placeholder": "Please Fill Out The Form",
+            "show": {
+              "startInputType": "formInput"
+            },
+            "id": "startAgentflow_0-input-formTitle-string",
+            "display": true
+          },
+          {
+            "label": "Form Description",
+            "name": "formDescription",
+            "type": "string",
+            "placeholder": "Complete all fields below to continue",
+            "show": {
+              "startInputType": "formInput"
+            },
+            "id": "startAgentflow_0-input-formDescription-string",
+            "display": true
+          },
+          {
+            "label": "Form Input Types",
+            "name": "formInputTypes",
+            "description": "Specify the type of form input",
+            "type": "array",
+            "show": {
+              "startInputType": "formInput"
+            },
+            "array": [
+              {
+                "label": "Type",
+                "name": "type",
+                "type": "options",
+                "options": [
+                  {
+                    "label": "String",
+                    "name": "string"
+                  },
+                  {
+                    "label": "Number",
+                    "name": "number"
+                  },
+                  {
+                    "label": "Boolean",
+                    "name": "boolean"
+                  },
+                  {
+                    "label": "Options",
+                    "name": "options"
+                  }
+                ],
+                "default": "string"
+              },
+              {
+                "label": "Label",
+                "name": "label",
+                "type": "string",
+                "placeholder": "Label for the input"
+              },
+              {
+                "label": "Variable Name",
+                "name": "name",
+                "type": "string",
+                "placeholder": "Variable name for the input (must be camel case)",
+                "description": "Variable name must be camel case. For example: firstName, lastName, etc."
+              },
+              {
+                "label": "Add Options",
+                "name": "addOptions",
+                "type": "array",
+                "show": {
+                  "formInputTypes[$index].type": "options"
+                },
+                "array": [
+                  {
+                    "label": "Option",
+                    "name": "option",
+                    "type": "string"
+                  }
+                ]
+              }
+            ],
+            "id": "startAgentflow_0-input-formInputTypes-array",
+            "display": true
+          },
+          {
+            "label": "Ephemeral Memory",
+            "name": "startEphemeralMemory",
+            "type": "boolean",
+            "description": "Start fresh for every execution without past chat history",
+            "optional": true,
+            "id": "startAgentflow_0-input-startEphemeralMemory-boolean",
+            "display": true
+          },
+          {
+            "label": "Flow State",
+            "name": "startState",
+            "description": "Runtime state during the execution of the workflow",
+            "type": "array",
+            "optional": true,
+            "array": [
+              {
+                "label": "Key",
+                "name": "key",
+                "type": "string",
+                "placeholder": "Foo"
+              },
+              {
+                "label": "Value",
+                "name": "value",
+                "type": "string",
+                "placeholder": "Bar",
+                "optional": true
+              }
+            ],
+            "id": "startAgentflow_0-input-startState-array",
+            "display": true
+          },
+          {
+            "label": "Persist State",
+            "name": "startPersistState",
+            "type": "boolean",
+            "description": "Persist the state in the same session",
+            "optional": true,
+            "id": "startAgentflow_0-input-startPersistState-boolean",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "startInputType": "formInput",
+          "formTitle": "Richiesta preventivo AgentHub",
+          "formDescription": "Payload inviato dalla demo mail automation quando un lead richiede un preventivo",
+          "formInputTypes": [
+            {
+              "type": "string",
+              "label": "Evento",
+              "name": "event",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Lead ID",
+              "name": "leadId",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Nome",
+              "name": "name",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Email",
+              "name": "email",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Azienda",
+              "name": "company",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Sito web",
+              "name": "website",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Ruolo",
+              "name": "role",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Obiettivo",
+              "name": "useCase",
+              "addOptions": ""
+            },
+            {
+              "type": "string",
+              "label": "Data richiesta preventivo",
+              "name": "quoteRequestedAt",
+              "addOptions": ""
+            },
+            {
+              "type": "number",
+              "label": "Invii usati",
+              "name": "usedRuns",
+              "addOptions": ""
+            },
+            {
+              "type": "number",
+              "label": "Invii rimasti",
+              "name": "remainingRuns",
+              "addOptions": ""
+            },
+            {
+              "type": "number",
+              "label": "Invii massimi",
+              "name": "maxRuns",
+              "addOptions": ""
+            }
+          ],
+          "startEphemeralMemory": true,
+          "startState": "",
+          "startPersistState": ""
+        },
+        "outputAnchors": [
+          {
+            "id": "startAgentflow_0-output-startAgentflow",
+            "label": "Start",
+            "name": "startAgentflow"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "width": 103,
+      "height": 66,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -170,
+        "y": 120
+      },
+      "dragging": false
+    },
+    {
+      "id": "toolAgentflow_0",
+      "position": {
+        "x": 95,
+        "y": 120
+      },
+      "data": {
+        "id": "toolAgentflow_0",
+        "label": "Append Google Sheet",
+        "version": 1.2,
+        "name": "toolAgentflow",
+        "type": "Tool",
+        "color": "#d4a373",
+        "baseClasses": [
+          "Tool"
+        ],
+        "category": "Agent Flows",
+        "description": "Tools allow LLM to interact with external systems",
+        "inputParams": [
+          {
+            "label": "Tool",
+            "name": "toolAgentflowSelectedTool",
+            "type": "asyncOptions",
+            "loadMethod": "listTools",
+            "loadConfig": true,
+            "id": "toolAgentflow_0-input-toolAgentflowSelectedTool-asyncOptions",
+            "display": true
+          },
+          {
+            "label": "Tool Input Arguments",
+            "name": "toolInputArgs",
+            "type": "array",
+            "acceptVariable": true,
+            "refresh": true,
+            "array": [
+              {
+                "label": "Input Argument Name",
+                "name": "inputArgName",
+                "type": "asyncOptions",
+                "loadMethod": "listToolInputArgs",
+                "refresh": true
+              },
+              {
+                "label": "Input Argument Value",
+                "name": "inputArgValue",
+                "type": "string",
+                "acceptVariable": true
+              }
+            ],
+            "show": {
+              "toolAgentflowSelectedTool": ".+"
+            },
+            "id": "toolAgentflow_0-input-toolInputArgs-array",
+            "display": true
+          },
+          {
+            "label": "Update Flow State",
+            "name": "toolUpdateState",
+            "description": "Update runtime state during the execution of the workflow",
+            "type": "array",
+            "optional": true,
+            "acceptVariable": true,
+            "array": [
+              {
+                "label": "Key",
+                "name": "key",
+                "type": "asyncOptions",
+                "loadMethod": "listRuntimeStateKeys"
+              },
+              {
+                "label": "Value",
+                "name": "value",
+                "type": "string",
+                "acceptVariable": true,
+                "acceptNodeOutputAsVariable": true
+              }
+            ],
+            "id": "toolAgentflow_0-input-toolUpdateState-array",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "toolAgentflowSelectedTool": "googleSheetsTool",
+          "toolInputArgs": [
+            {
+              "inputArgName": "spreadsheetId",
+              "inputArgValue": "<p>1m0cy4el1lM2c5JQaoD3w4P7ukWWK-XfASWevqTUC5YA</p>"
+            },
+            {
+              "inputArgName": "range",
+              "inputArgValue": "<p>Leads!A:K</p>"
+            },
+            {
+              "inputArgName": "values",
+              "inputArgValue": "<p>[[\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.quoteRequestedAt\" data-label=\"$form.quoteRequestedAt\" data-mention-suggestion-char=\"@\">{{ $form.quoteRequestedAt }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.name\" data-label=\"$form.name\" data-mention-suggestion-char=\"@\">{{ $form.name }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.email\" data-label=\"$form.email\" data-mention-suggestion-char=\"@\">{{ $form.email }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.company\" data-label=\"$form.company\" data-mention-suggestion-char=\"@\">{{ $form.company }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.website\" data-label=\"$form.website\" data-mention-suggestion-char=\"@\">{{ $form.website }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.role\" data-label=\"$form.role\" data-mention-suggestion-char=\"@\">{{ $form.role }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.useCase\" data-label=\"$form.useCase\" data-mention-suggestion-char=\"@\">{{ $form.useCase }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.usedRuns\" data-label=\"$form.usedRuns\" data-mention-suggestion-char=\"@\">{{ $form.usedRuns }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.remainingRuns\" data-label=\"$form.remainingRuns\" data-mention-suggestion-char=\"@\">{{ $form.remainingRuns }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.maxRuns\" data-label=\"$form.maxRuns\" data-mention-suggestion-char=\"@\">{{ $form.maxRuns }}</span>\",\"<span class=\"variable\" data-type=\"mention\" data-id=\"$form.leadId\" data-label=\"$form.leadId\" data-mention-suggestion-char=\"@\">{{ $form.leadId }}</span>\"]]</p>"
+            },
+            {
+              "inputArgName": "valueInputOption",
+              "inputArgValue": "<p>USER_ENTERED</p>"
+            },
+            {
+              "inputArgName": "insertDataOption",
+              "inputArgValue": "<p>INSERT_ROWS</p>"
+            },
+            {
+              "inputArgName": "majorDimension",
+              "inputArgValue": "<p>ROWS</p>"
+            }
+          ],
+          "toolUpdateState": "",
+          "toolAgentflowSelectedToolConfig": {
+            "sheetsType": "values",
+            "valuesActions": "[\"appendValues\"]",
+            "toolAgentflowSelectedTool": "googleSheetsTool"
+          }
+        },
+        "outputAnchors": [
+          {
+            "id": "toolAgentflow_0-output-toolAgentflow",
+            "label": "Tool",
+            "name": "toolAgentflow"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "type": "agentFlow",
+      "width": 112,
+      "height": 68,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 95,
+        "y": 120
+      },
+      "dragging": false
+    },
+    {
+      "id": "toolAgentflow_1",
+      "position": {
+        "x": 360,
+        "y": 120
+      },
+      "data": {
+        "id": "toolAgentflow_1",
+        "label": "Send Gmail Notification",
+        "version": 1.2,
+        "name": "toolAgentflow",
+        "type": "Tool",
+        "color": "#d4a373",
+        "baseClasses": [
+          "Tool"
+        ],
+        "category": "Agent Flows",
+        "description": "Tools allow LLM to interact with external systems",
+        "inputParams": [
+          {
+            "label": "Tool",
+            "name": "toolAgentflowSelectedTool",
+            "type": "asyncOptions",
+            "loadMethod": "listTools",
+            "loadConfig": true,
+            "id": "toolAgentflow_1-input-toolAgentflowSelectedTool-asyncOptions",
+            "display": true
+          },
+          {
+            "label": "Tool Input Arguments",
+            "name": "toolInputArgs",
+            "type": "array",
+            "acceptVariable": true,
+            "refresh": true,
+            "array": [
+              {
+                "label": "Input Argument Name",
+                "name": "inputArgName",
+                "type": "asyncOptions",
+                "loadMethod": "listToolInputArgs",
+                "refresh": true
+              },
+              {
+                "label": "Input Argument Value",
+                "name": "inputArgValue",
+                "type": "string",
+                "acceptVariable": true
+              }
+            ],
+            "show": {
+              "toolAgentflowSelectedTool": ".+"
+            },
+            "id": "toolAgentflow_1-input-toolInputArgs-array",
+            "display": true
+          },
+          {
+            "label": "Update Flow State",
+            "name": "toolUpdateState",
+            "description": "Update runtime state during the execution of the workflow",
+            "type": "array",
+            "optional": true,
+            "acceptVariable": true,
+            "array": [
+              {
+                "label": "Key",
+                "name": "key",
+                "type": "asyncOptions",
+                "loadMethod": "listRuntimeStateKeys"
+              },
+              {
+                "label": "Value",
+                "name": "value",
+                "type": "string",
+                "acceptVariable": true,
+                "acceptNodeOutputAsVariable": true
+              }
+            ],
+            "id": "toolAgentflow_1-input-toolUpdateState-array",
+            "display": true
+          }
+        ],
+        "inputAnchors": [],
+        "inputs": {
+          "toolAgentflowSelectedTool": "gmail",
+          "toolInputArgs": [
+            {
+              "inputArgName": "to",
+              "inputArgValue": "<p>tonycarmellino@gmail.com</p>"
+            },
+            {
+              "inputArgName": "subject",
+              "inputArgValue": "<p>Nuova richiesta preventivo - <span class=\"variable\" data-type=\"mention\" data-id=\"$form.company\" data-label=\"$form.company\" data-mention-suggestion-char=\"@\">{{ $form.company }}</span> <span class=\"variable\" data-type=\"mention\" data-id=\"$form.email\" data-label=\"$form.email\" data-mention-suggestion-char=\"@\">{{ $form.email }}</span></p>"
+            },
+            {
+              "inputArgName": "body",
+              "inputArgValue": "<p>Nuova richiesta preventivo ricevuta dalla demo Mail Automation.</p><p>Google Sheet lead: <a href=\"https://docs.google.com/spreadsheets/d/1m0cy4el1lM2c5JQaoD3w4P7ukWWK-XfASWevqTUC5YA/edit\">apri il foglio</a></p><p>In allegato trovi il file Excel con i dati del lead.</p><p><strong>Nome:</strong> <span class=\"variable\" data-type=\"mention\" data-id=\"$form.name\" data-label=\"$form.name\" data-mention-suggestion-char=\"@\">{{ $form.name }}</span><br><strong>Email:</strong> <span class=\"variable\" data-type=\"mention\" data-id=\"$form.email\" data-label=\"$form.email\" data-mention-suggestion-char=\"@\">{{ $form.email }}</span><br><strong>Azienda:</strong> <span class=\"variable\" data-type=\"mention\" data-id=\"$form.company\" data-label=\"$form.company\" data-mention-suggestion-char=\"@\">{{ $form.company }}</span><br><strong>Uso demo:</strong> <span class=\"variable\" data-type=\"mention\" data-id=\"$form.usedRuns\" data-label=\"$form.usedRuns\" data-mention-suggestion-char=\"@\">{{ $form.usedRuns }}</span>/<span class=\"variable\" data-type=\"mention\" data-id=\"$form.maxRuns\" data-label=\"$form.maxRuns\" data-mention-suggestion-char=\"@\">{{ $form.maxRuns }}</span> invii.</p>"
+            },
+            {
+              "inputArgName": "attachmentFilename",
+              "inputArgValue": "<p>lead-preventivo.xls</p>"
+            },
+            {
+              "inputArgName": "attachmentMimeType",
+              "inputArgValue": "<p>application/vnd.ms-excel</p>"
+            },
+            {
+              "inputArgName": "attachmentContent",
+              "inputArgValue": "<p><table border=\"1\"><thead><tr><th>Data richiesta</th><th>Nome</th><th>Email</th><th>Azienda</th><th>Sito web</th><th>Ruolo</th><th>Obiettivo</th><th>Invii usati</th><th>Invii rimasti</th><th>Invii massimi</th><th>Lead ID</th></tr></thead><tbody><tr><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.quoteRequestedAt\" data-label=\"$form.quoteRequestedAt\" data-mention-suggestion-char=\"@\">{{ $form.quoteRequestedAt }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.name\" data-label=\"$form.name\" data-mention-suggestion-char=\"@\">{{ $form.name }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.email\" data-label=\"$form.email\" data-mention-suggestion-char=\"@\">{{ $form.email }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.company\" data-label=\"$form.company\" data-mention-suggestion-char=\"@\">{{ $form.company }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.website\" data-label=\"$form.website\" data-mention-suggestion-char=\"@\">{{ $form.website }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.role\" data-label=\"$form.role\" data-mention-suggestion-char=\"@\">{{ $form.role }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.useCase\" data-label=\"$form.useCase\" data-mention-suggestion-char=\"@\">{{ $form.useCase }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.usedRuns\" data-label=\"$form.usedRuns\" data-mention-suggestion-char=\"@\">{{ $form.usedRuns }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.remainingRuns\" data-label=\"$form.remainingRuns\" data-mention-suggestion-char=\"@\">{{ $form.remainingRuns }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.maxRuns\" data-label=\"$form.maxRuns\" data-mention-suggestion-char=\"@\">{{ $form.maxRuns }}</span></td><td><span class=\"variable\" data-type=\"mention\" data-id=\"$form.leadId\" data-label=\"$form.leadId\" data-mention-suggestion-char=\"@\">{{ $form.leadId }}</span></td></tr></tbody></table></p>"
+            }
+          ],
+          "toolUpdateState": "",
+          "toolAgentflowSelectedToolConfig": {
+            "gmailType": "messages",
+            "messageActions": "[\"sendMessage\"]",
+            "toolAgentflowSelectedTool": "gmail"
+          }
+        },
+        "outputAnchors": [
+          {
+            "id": "toolAgentflow_1-output-toolAgentflow",
+            "label": "Tool",
+            "name": "toolAgentflow"
+          }
+        ],
+        "outputs": {},
+        "selected": false
+      },
+      "type": "agentFlow",
+      "width": 112,
+      "height": 68,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 360,
+        "y": 120
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "source": "startAgentflow_0",
+      "sourceHandle": "startAgentflow_0-output-startAgentflow",
+      "target": "toolAgentflow_0",
+      "targetHandle": "toolAgentflow_0",
+      "data": {
+        "sourceColor": "#7EE787",
+        "targetColor": "#d4a373",
+        "isHumanInput": false
+      },
+      "type": "agentFlow",
+      "id": "startAgentflow_0-startAgentflow_0-output-startAgentflow-toolAgentflow_0-toolAgentflow_0"
+    },
+    {
+      "source": "toolAgentflow_0",
+      "sourceHandle": "toolAgentflow_0-output-toolAgentflow",
+      "target": "toolAgentflow_1",
+      "targetHandle": "toolAgentflow_1",
+      "data": {
+        "sourceColor": "#d4a373",
+        "targetColor": "#d4a373",
+        "isHumanInput": false
+      },
+      "type": "agentFlow",
+      "id": "toolAgentflow_0-toolAgentflow_0-output-toolAgentflow-toolAgentflow_1-toolAgentflow_1"
+    }
+  ]
+}
