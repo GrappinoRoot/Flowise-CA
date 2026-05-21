@@ -1,8 +1,4 @@
 {
-  "description": "An agent that can perform question answering over a database",
-  "usecases": [
-    "SQL"
-  ],
   "nodes": [
     {
       "id": "startAgentflow_0",
@@ -290,7 +286,7 @@
         "inputAnchors": [],
         "inputs": {
           "customFunctionInputVariables": "",
-          "customFunctionJavascriptFunction": "const { Pool } = require('pg');\n\nconst pool = new Pool({\n  host: 'postgres',\n  port: 5432,\n  user: 'testuser',\n  password: 'testpwd',\n  database: 'abudhabi',\n});\n\nlet sqlSchemaPrompt = '';\n\nfunction quoteIdent(identifier) {\n  return '\"' + String(identifier).replace(/\"/g, '\"\"') + '\"';\n}\n\nfunction formatValue(value) {\n  if (value === null || value === undefined) return 'NULL';\n  if (value instanceof Date) return value.toISOString();\n  if (typeof value === 'object') return JSON.stringify(value);\n  return String(value);\n}\n\nasync function getSQLPrompt() {\n  const client = await pool.connect();\n  try {\n    const tablesResult = await client.query(`\n      SELECT table_name\n      FROM information_schema.tables\n      WHERE table_schema = 'public' AND table_type = 'BASE TABLE'\n      ORDER BY table_name\n    `);\n\n    for (const tableRow of tablesResult.rows) {\n      const tableName = tableRow.table_name;\n\n      const schemaInfo = await client.query(`\n        SELECT column_name, data_type, is_nullable\n        FROM information_schema.columns\n        WHERE table_schema = 'public' AND table_name = $1\n        ORDER BY ordinal_position\n      `, [tableName]);\n\n      const createColumns = [];\n      const columnNames = [];\n\n      for (const column of schemaInfo.rows) {\n        const name = column.column_name;\n        const type = column.data_type.toUpperCase();\n        const notNull = column.is_nullable === 'NO' ? 'NOT NULL' : '';\n        columnNames.push(name);\n        createColumns.push(`${quoteIdent(name)} ${type} ${notNull}`.trim());\n      }\n\n      const quotedTableName = quoteIdent(tableName);\n      const sqlCreateTableQuery = `CREATE TABLE ${quotedTableName} (${createColumns.join(', ')})`;\n      const sqlSelectTableQuery = `SELECT * FROM ${quotedTableName} LIMIT 3`;\n\n      let allValues = [];\n      try {\n        const rows = await client.query(sqlSelectTableQuery);\n        allValues = rows.rows.map(row =>\n          columnNames.map(col => formatValue(row[col])).join(' ')\n        );\n      } catch (err) {\n        allValues.push('[ERROR FETCHING ROWS]');\n      }\n\n      sqlSchemaPrompt +=\n        sqlCreateTableQuery +\n        '\\n' +\n        sqlSelectTableQuery +\n        '\\n' +\n        columnNames.join(' ') +\n        '\\n' +\n        allValues.join('\\n') +\n        '\\n\\n';\n    }\n  } finally {\n    client.release();\n    await pool.end();\n  }\n}\n\nawait getSQLPrompt();\nreturn sqlSchemaPrompt;",
+          "customFunctionJavascriptFunction": "const { Pool } = require('pg');\n\nconst pool = new Pool({\n  host: 'postgres',\n  port: 5432,\n  user: 'testuser',\n  password: 'testpwd',\n  database: 'abudhabi',\n});\n\nlet sqlSchemaPrompt = '';\n\nfunction quoteIdent(identifier) {\n  return '\"' + String(identifier).replace(/\"/g, '\"\"') + '\"';\n}\n\nfunction formatValue(value) {\n  if (value === null || value === undefined) return 'NULL';\n  if (value instanceof Date) return value.toISOString();\n  if (typeof value === 'object') return JSON.stringify(value);\n  return String(value);\n}\n\nconst client = await pool.connect();\n\ntry {\n  const tablesResult = await client.query(`\n    SELECT table_name\n    FROM information_schema.tables\n    WHERE table_schema = 'public' AND table_type = 'BASE TABLE'\n    ORDER BY table_name\n  `);\n\n  for (const tableRow of tablesResult.rows) {\n    const tableName = tableRow.table_name;\n\n    const schemaInfo = await client.query(`\n      SELECT column_name, data_type, is_nullable\n      FROM information_schema.columns\n      WHERE table_schema = 'public' AND table_name = $1\n      ORDER BY ordinal_position\n    `, [tableName]);\n\n    const createColumns = [];\n    const columnNames = [];\n\n    for (const column of schemaInfo.rows) {\n      const name = column.column_name;\n      const type = column.data_type.toUpperCase();\n      const notNull = column.is_nullable === 'NO' ? 'NOT NULL' : '';\n\n      columnNames.push(name);\n      createColumns.push(`${quoteIdent(name)} ${type} ${notNull}`.trim());\n    }\n\n    const quotedTableName = quoteIdent(tableName);\n    const sqlCreateTableQuery = `CREATE TABLE ${quotedTableName} (${createColumns.join(', ')})`;\n    const sqlSelectTableQuery = `SELECT * FROM ${quotedTableName} LIMIT 3`;\n\n    let allValues = [];\n\n    try {\n      const rows = await client.query(sqlSelectTableQuery);\n      allValues = rows.rows.map(row =>\n        columnNames.map(col => formatValue(row[col])).join(' ')\n      );\n    } catch (err) {\n      allValues.push('[ERROR FETCHING ROWS]');\n    }\n\n    sqlSchemaPrompt +=\n      sqlCreateTableQuery +\n      '\\n' +\n      sqlSelectTableQuery +\n      '\\n' +\n      columnNames.join(' ') +\n      '\\n' +\n      allValues.join('\\n') +\n      '\\n\\n';\n  }\n} finally {\n  client.release();\n  await pool.end();\n}\n\nreturn sqlSchemaPrompt;",
           "customFunctionUpdateState": ""
         },
         "outputAnchors": [
@@ -588,11 +584,11 @@
         ],
         "inputAnchors": [],
         "inputs": {
-          "llmModel": "chatAnthropic",
+          "llmModel": "chatMistralAI",
           "llmMessages": [
             {
               "role": "system",
-              "content": "<p>You are an agent designed to interact with a SQL database. Given an input question, create a syntactically correct sqlite query to run, then look at the results of the query and return the answer. Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most 5 results. You can order the results by a relevant column to return the most interesting examples in the database. Never query for all the columns from a specific table, only ask for the relevant columns given the question. DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.</p><p>Here is the relevant table info:</p><p><span class=\"variable\" data-type=\"mention\" data-id=\"customFunctionAgentflow_0\" data-label=\"customFunctionAgentflow_0\">{{ customFunctionAgentflow_0 }}</span></p><p>Note:</p><ul><li><p> Only generate ONE SQL query</p></li></ul><p></p>"
+              "content": "You are an agent designed to interact with a SQL database. Given an input question, create a syntactically correct PostgreSQL query to run, then look at the results of the query and return the answer.\n\nUnless the user specifies a specific number of examples they wish to obtain, always limit your query to at most 5 results.\n\nYou can order the results by a relevant column to return the most interesting examples in the database.\n\nNever query for all the columns from a specific table, only ask for the relevant columns given the question.\n\nDO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.\n\nHere is the relevant table info:\n\n{{customFunctionAgentflow_0}}\n\nNote:\n\n- Only generate ONE SQL query"
             }
           ],
           "llmEnableMemory": true,
@@ -611,21 +607,20 @@
           "llmUpdateState": [
             {
               "key": "sqlQuery",
-              "value": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"output.sql_query\" data-label=\"output.sql_query\">{{ output.sql_query }}</span> </p>"
+              "value": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"output.sql_query\" data-label=\"output.sql_query\" data-mention-suggestion-char=\"@\">{{ output.sql_query }}</span></p>"
             }
           ],
           "llmModelConfig": {
             "credential": "",
-            "modelName": "claude-sonnet-4-0",
+            "modelName": "mistral-tiny",
             "temperature": 0.9,
             "streaming": true,
-            "maxTokensToSample": "",
+            "maxOutputTokens": "",
             "topP": "",
-            "topK": "",
-            "extendedThinking": "",
-            "budgetTokens": 1024,
-            "allowImageUploads": "",
-            "llmModel": "chatAnthropic"
+            "randomSeed": "",
+            "safeMode": "",
+            "overrideEndpoint": "",
+            "llmModel": "chatMistralAI"
           }
         },
         "outputAnchors": [
@@ -639,7 +634,7 @@
         "selected": false
       },
       "type": "agentFlow",
-      "width": 213,
+      "width": 206,
       "height": 72,
       "selected": false,
       "positionAbsolute": {
@@ -725,9 +720,9 @@
         ],
         "inputAnchors": [],
         "inputs": {
-          "conditionAgentModel": "chatOpenAI",
-          "conditionAgentInstructions": "<p>You are a SQL expert with a strong attention to detail. Double check the SQL query for common mistakes, including:</p><p>- Using NOT IN with NULL values</p><p>- Using UNION when UNION ALL should have been used</p><p>- Using BETWEEN for exclusive ranges</p><p>- Data type mismatch in predicates</p><p>- Properly quoting identifiers</p><p>- Using the correct number of arguments for functions</p><p>- Casting to the correct data type</p><p>- Using the proper columns for joins</p>",
-          "conditionAgentInput": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"$flow.state.sqlQuery\" data-label=\"$flow.state.sqlQuery\">{{ $flow.state.sqlQuery }}</span> </p>",
+          "conditionAgentModel": "chatMistralAI",
+          "conditionAgentInstructions": "You are a PostgreSQL query validator.\n\nYour job is to decide if the SQL query can be executed safely against the provided database schema.\n\nChoose \"SQL query is correct and does not contains mistakes\" when:\n\n- the query is a read-only SELECT query\n\n- the query uses PostgreSQL syntax\n\n- the referenced table and columns exist in the provided schema\n\n- the query answers the user request\n\n- the query includes LIMIT when returning lists\n\nChoose \"SQL query contains mistakes\" only when:\n\n- the SQL syntax is invalid\n\n- the query references tables or columns that do not exist in the provided schema\n\n- the query is not a SELECT query\n\n- the query contains INSERT, UPDATE, DELETE, DROP, TRUNCATE, ALTER, or CREATE\n\n- the query cannot be executed\n\nDo not reject a valid SELECT query just because it is simple.\n\nDo not add explanations.\n\nOnly select one scenario.",
+          "conditionAgentInput": "SQL query:\n\n{{$flow.state.sqlQuery}}\n\nDatabase schema:\n\n{{customFunctionAgentflow_0}}",
           "conditionAgentScenarios": [
             {
               "scenario": "SQL query is correct and does not contains mistakes"
@@ -738,23 +733,15 @@
           ],
           "conditionAgentModelConfig": {
             "credential": "",
-            "modelName": "gpt-4o-mini",
+            "modelName": "mistral-tiny",
             "temperature": 0.9,
             "streaming": true,
-            "maxTokens": "",
+            "maxOutputTokens": "",
             "topP": "",
-            "frequencyPenalty": "",
-            "presencePenalty": "",
-            "timeout": "",
-            "strictToolCalling": "",
-            "stopSequence": "",
-            "basepath": "",
-            "proxyUrl": "",
-            "baseOptions": "",
-            "allowImageUploads": "",
-            "imageResolution": "low",
-            "reasoningEffort": "",
-            "conditionAgentModel": "chatOpenAI"
+            "randomSeed": "",
+            "safeMode": "",
+            "overrideEndpoint": "",
+            "conditionAgentModel": "chatMistralAI"
           }
         },
         "outputAnchors": [
@@ -775,7 +762,7 @@
         "selected": false
       },
       "type": "agentFlow",
-      "width": 187,
+      "width": 188,
       "height": 80,
       "selected": false,
       "positionAbsolute": {
@@ -844,7 +831,7 @@
     {
       "id": "customFunctionAgentflow_1",
       "position": {
-        "x": 761.3261621815544,
+        "x": 760.2156028828263,
         "y": 44.65096212173265
       },
       "data": {
@@ -924,10 +911,10 @@
           "customFunctionInputVariables": [
             {
               "variableName": "sqlQuery",
-              "variableValue": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"$flow.state.sqlQuery\" data-label=\"$flow.state.sqlQuery\">{{ $flow.state.sqlQuery }}</span> </p>"
+              "variableValue": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"$flow.state.sqlQuery\" data-label=\"$flow.state.sqlQuery\" data-mention-suggestion-char=\"@\">{{ $flow.state.sqlQuery }}</span></p>"
             }
           ],
-          "customFunctionJavascriptFunction": "const { Pool } = require('pg');\n\nconst pool = new Pool({\n  host: 'postgres',\n  port: 5432,\n  user: 'testuser',\n  password: 'testpwd',\n  database: 'abudhabi',\n});\n\nconst sqlQuery = $sqlQuery;\nlet formattedResult = '';\n\nfunction formatValue(value) {\n  if (value === null || value === undefined) return 'NULL';\n  if (value instanceof Date) return value.toISOString();\n  if (typeof value === 'object') return JSON.stringify(value);\n  return String(value);\n}\n\nasync function runSQLQuery(query) {\n  try {\n    const result = await pool.query(query);\n    const rows = result.rows;\n\n    if (rows.length === 0) {\n      formattedResult = '[No results returned]';\n    } else {\n      const columnNames = Object.keys(rows[0]);\n      const header = columnNames.join(' ');\n      const values = rows.map(row =>\n        columnNames.map(col => formatValue(row[col])).join(' ')\n      );\n\n      formattedResult = query + '\\n' + header + '\\n' + values.join('\\n');\n    }\n  } catch (err) {\n    console.error('[ERROR]', err);\n    formattedResult = `[Error executing query]: ${err.message || err}`;\n  } finally {\n    await pool.end();\n  }\n\n  return formattedResult;\n}\n\nreturn await runSQLQuery(sqlQuery);",
+          "customFunctionJavascriptFunction": "const { Pool } = require('pg');\n\nconst pool = new Pool({\n  host: 'postgres',\n  port: 5432,\n  user: 'testuser',\n  password: 'testpwd',\n  database: 'abudhabi',\n});\n\nconst sqlQuery = $sqlQuery;\nlet formattedResult = '';\n\nfunction formatValue(value) {\n  if (value === null || value === undefined) return 'NULL';\n  if (value instanceof Date) return value.toISOString();\n  if (typeof value === 'object') return JSON.stringify(value);\n  return String(value);\n}\n\nasync function runSQLQuery(query) {\n  try {\n    const result = await pool.query(query);\n    const rows = result.rows;\n\n    if (rows.length === 0) {\n     formattedResult = `[SQL executed successfully] ${result.command}. Rows affected:              ${result.rowCount ?? 0}`;\n    } else {\n      const columnNames = Object.keys(rows[0]);\n      const header = columnNames.join(' ');\n      const values = rows.map(row =>\n      columnNames.map(col => formatValue(row[col])).join(' ')\n      );\n\n      formattedResult = query + '\\n' + header + '\\n' + values.join('\\n');\n    }\n  } catch (err) {\n    console.error('[ERROR]', err);\n    formattedResult = `[Error executing query]: ${err.message || err}`;\n  } finally {\n    await pool.end();\n  }\n\n  return formattedResult;\n}\n\nreturn await runSQLQuery(sqlQuery);",
           "customFunctionUpdateState": ""
         },
         "outputAnchors": [
@@ -945,7 +932,7 @@
       "height": 66,
       "selected": false,
       "positionAbsolute": {
-        "x": 761.3261621815544,
+        "x": 760.2156028828263,
         "y": 44.65096212173265
       },
       "dragging": false
@@ -1225,28 +1212,25 @@
         ],
         "inputAnchors": [],
         "inputs": {
-          "llmModel": "chatGoogleGenerativeAI",
+          "llmModel": "chatMistralAI",
           "llmMessages": [],
           "llmEnableMemory": true,
           "llmMemoryType": "allMessages",
-          "llmUserMessage": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"customFunctionAgentflow_1\" data-label=\"customFunctionAgentflow_1\">{{ customFunctionAgentflow_1 }}</span> </p>",
+          "llmUserMessage": "{{customFunctionAgentflow_1}}",
           "llmReturnResponseAs": "userMessage",
           "llmStructuredOutput": "",
           "llmUpdateState": "",
           "llmModelConfig": {
             "credential": "",
-            "modelName": "gemini-2.0-flash",
-            "customModelName": "",
+            "modelName": "mistral-tiny",
             "temperature": 0.9,
             "streaming": true,
             "maxOutputTokens": "",
             "topP": "",
-            "topK": "",
-            "harmCategory": "",
-            "harmBlockThreshold": "",
-            "baseUrl": "",
-            "allowImageUploads": "",
-            "llmModel": "chatGoogleGenerativeAI"
+            "randomSeed": "",
+            "safeMode": "",
+            "overrideEndpoint": "",
+            "llmModel": "chatMistralAI"
           },
           "undefined": ""
         },
@@ -1261,7 +1245,7 @@
         "selected": false
       },
       "type": "agentFlow",
-      "width": 199,
+      "width": 183,
       "height": 72,
       "selected": false,
       "positionAbsolute": {
@@ -1348,8 +1332,8 @@
         "inputAnchors": [],
         "inputs": {
           "conditionAgentModel": "chatMistralAI",
-          "conditionAgentInstructions": "<p>You are a SQL expert. Check if the query result is correct or contains error.</p>",
-          "conditionAgentInput": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"customFunctionAgentflow_1\" data-label=\"customFunctionAgentflow_1\">{{ customFunctionAgentflow_1 }}</span> </p>",
+          "conditionAgentInstructions": "You are a SQL expert. Check if the query result is correct or contains error.",
+          "conditionAgentInput": "{{customFunctionAgentflow_1}}",
           "conditionAgentScenarios": [
             {
               "scenario": "Result is correct and does not contains error"
@@ -1389,7 +1373,7 @@
         "selected": false
       },
       "type": "agentFlow",
-      "width": 228,
+      "width": 229,
       "height": 80,
       "selected": false,
       "positionAbsolute": {
@@ -1731,16 +1715,20 @@
         ],
         "inputAnchors": [],
         "inputs": {
-          "llmModel": "chatAnthropic",
+          "llmModel": "chatMistralAI",
           "llmMessages": [
             {
               "role": "system",
-              "content": "<p>You are an agent designed to interact with a SQL database. Given an input question, create a syntactically correct sqlite query to run, then look at the results of the query and return the answer. Unless the user specifies a specific number of examples they wish to obtain, always limit your query to at most 5 results. You can order the results by a relevant column to return the most interesting examples in the database. Never query for all the columns from a specific table, only ask for the relevant columns given the question. DO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.</p><p>Here is the relevant table info:</p><p><span class=\"variable\" data-type=\"mention\" data-id=\"customFunctionAgentflow_0\" data-label=\"customFunctionAgentflow_0\">{{ customFunctionAgentflow_0 }}</span> </p><p></p>"
+              "content": "You are an agent designed to interact with a SQL database. Given an input question, create a syntactically correct PostgreSQL query to run, then look at the results of the query and return the answer.\n\nUnless the user specifies a specific number of examples they wish to obtain, always limit your query to at most 5 results.\n\nYou can order the results by a relevant column to return the most interesting examples in the database.\n\nNever query for all the columns from a specific table, only ask for the relevant columns given the question.\n\nDO NOT make any DML statements (INSERT, UPDATE, DELETE, DROP etc.) to the database.\n\nHere is the relevant table info:\n\n{{customFunctionAgentflow_0}}"
+            },
+            {
+              "role": "user",
+              "content": "Given the generated SQL Query: {{$flow.state.sqlQuery}}\n\nI have the following error: {{customFunctionAgentflow_1}}\n\nRegenerate a new SQL Query that will fix the error"
             }
           ],
           "llmEnableMemory": true,
           "llmMemoryType": "allMessages",
-          "llmUserMessage": "<p>Given the generated SQL Query: <span class=\"variable\" data-type=\"mention\" data-id=\"$flow.state.sqlQuery\" data-label=\"$flow.state.sqlQuery\">{{ $flow.state.sqlQuery }}</span> </p><p>I have the following error: <span class=\"variable\" data-type=\"mention\" data-id=\"customFunctionAgentflow_1\" data-label=\"customFunctionAgentflow_1\">{{ customFunctionAgentflow_1 }}</span> </p><p>Regenerate a new SQL Query that will fix the error</p>",
+          "llmUserMessage": "Given the generated SQL Query: {{$flow.state.sqlQuery}}\n\nI have the following error: {{customFunctionAgentflow_1}}\n\nRegenerate a new SQL Query that will fix the error",
           "llmReturnResponseAs": "userMessage",
           "llmStructuredOutput": [
             {
@@ -1754,21 +1742,20 @@
           "llmUpdateState": [
             {
               "key": "sqlQuery",
-              "value": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"output.sql_query\" data-label=\"output.sql_query\">{{ output.sql_query }}</span> </p>"
+              "value": "<p><span class=\"variable\" data-type=\"mention\" data-id=\"output.sql_query\" data-label=\"output.sql_query\" data-mention-suggestion-char=\"@\">{{ output.sql_query }}</span></p>"
             }
           ],
           "llmModelConfig": {
             "credential": "",
-            "modelName": "claude-sonnet-4-0",
+            "modelName": "mistral-tiny",
             "temperature": 0.9,
             "streaming": true,
-            "maxTokensToSample": "",
+            "maxOutputTokens": "",
             "topP": "",
-            "topK": "",
-            "extendedThinking": "",
-            "budgetTokens": 1024,
-            "allowImageUploads": "",
-            "llmModel": "chatAnthropic"
+            "randomSeed": "",
+            "safeMode": "",
+            "overrideEndpoint": "",
+            "llmModel": "chatMistralAI"
           }
         },
         "outputAnchors": [
@@ -1782,7 +1769,7 @@
         "selected": false
       },
       "type": "agentFlow",
-      "width": 220,
+      "width": 221,
       "height": 72,
       "selected": false,
       "positionAbsolute": {
