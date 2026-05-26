@@ -1,0 +1,33 @@
+.prompt-form {
+    display: flex;
+    gap: 12px;
+}
+
+.prompt-input {
+    flex: 1;
+    height: 44px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 15px;
+}
+
+.prompt-input:focus {
+    outline: none;
+    border-color: #111827;
+}
+
+.send-button {
+    height: 44px;
+    border: 0;
+    border-radius: 10px;
+    padding: 0 18px;
+    background: #111827;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.send-button:hover {
+    background: #1f2937;
+}

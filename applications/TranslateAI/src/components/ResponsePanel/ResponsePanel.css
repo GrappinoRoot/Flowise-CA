@@ -1,0 +1,17 @@
+.response-panel {
+    margin-top: 20px;
+}
+
+.response-box {
+    min-height: 180px;
+    margin: 0;
+    padding: 16px;
+    border-radius: 10px;
+    background: #f3f4f6;
+    color: #111827;
+    white-space: pre-wrap;
+    overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+}
