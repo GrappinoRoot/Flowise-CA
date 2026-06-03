@@ -10,13 +10,32 @@
 
 .chat-layout {
     flex: 1;
-    display: flex;
+    display: grid;
     flex-direction: column;
 }
 
-.messages {
-    flex: 1;
-    overflow-y: auto;
+.message {
+    max-width: 70%;
+    padding: 10px 12px;
+    margin: 6px 0;
+    border-radius: 12px;
+    word-break: break-word;
+}
+
+/* USER → destra */
+.message.user {
+    margin-left: auto;
+    background: #3b82f6;
+    color: white;
+    text-align: right;
+}
+
+/* ASSISTANT → sinistra */
+.message.assistant {
+    margin-right: auto;
+    background: #e5e7eb;
+    color: black;
+    text-align: left;
 }
 
 .composer {

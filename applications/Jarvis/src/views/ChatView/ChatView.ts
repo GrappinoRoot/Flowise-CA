@@ -33,13 +33,13 @@ export function mountChatView(container: HTMLElement) {
         const messages = activeConversation?.messages ?? []
 
         messagesContainer.innerHTML = messages
-            .map(
-                (message) => `
-                    <div>
+            .map((message) => {
+                return `
+                    <div class="message ${message.role}">
                         ${message.content}
                     </div>
                 `
-            )
+            })
             .join('')
     }
 
