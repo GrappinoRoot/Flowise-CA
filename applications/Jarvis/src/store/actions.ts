@@ -1,7 +1,7 @@
 import type { ChatMessage, Conversation } from '../types/chat'
 
 export const actions: {
-    [K in keyof ActionPayloadMap]: { id: number; process: (payload: ActionPayloadMap[K]) => unknown }
+    [K in keyof ActionPayloadMap]: { id: number; process: (payload: ActionPayloadMap[K]) => ActionPayloadMap[K] }
 } = {
     CONVERSATION_CREATED: { id: 0, process: (payload) => payload },
     CONVERSATION_SELECTED: { id: 1, process: (payload) => payload },
