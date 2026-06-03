@@ -1,4 +1,4 @@
-import type { ChatMessage, Conversation } from '../types/chat'
+import type { ChatMessage } from '../types/chat'
 
 export const actions: {
     [K in keyof ActionPayloadMap]: { id: number; process: (payload: ActionPayloadMap[K]) => ActionPayloadMap[K] }
@@ -12,7 +12,7 @@ export const actions: {
 }
 
 export type ActionPayloadMap = {
-    CONVERSATION_CREATED: Conversation
+    CONVERSATION_CREATED: { Id: string; title: string }
     CONVERSATION_SELECTED: { conversationId: string }
     MESSAGE_ADDED: { conversationId: string; message: ChatMessage }
     LOADING_STARTED: void

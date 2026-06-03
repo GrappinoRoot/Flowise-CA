@@ -1,6 +1,7 @@
 import template from './Composer.html?raw'
 import './Composer.css'
 import { dispatchStore } from '../../store/store'
+import { ERRORS } from '../../utils/errors'
 
 export function mountComposer(container: HTMLElement) {
     container.innerHTML = template
@@ -9,7 +10,8 @@ export function mountComposer(container: HTMLElement) {
     const inputElement = container.querySelector<HTMLInputElement>('[data-composer-input]')
 
     if (!formElement || !inputElement) {
-        throw new Error('Composer elements not found')
+        console.error(ERRORS.COMPOSER_ELEMENTS_NOT_FOUND)
+        throw new Error(ERRORS.COMPOSER_ELEMENTS_NOT_FOUND)
     }
 
     formElement.addEventListener('submit', async (event) => {

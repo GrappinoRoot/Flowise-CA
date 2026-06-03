@@ -42,3 +42,7 @@
     border-top: 1px solid #e5e7eb;
     padding: 16px;
 }
+
+.typing-indicator {
+    padding: 8px 12px;
+}
