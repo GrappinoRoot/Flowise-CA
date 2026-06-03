@@ -1,7 +1,6 @@
 import template from './Composer.html?raw'
 import './Composer.css'
 import { dispatchStore } from '../../store/store'
-import { sendToFlowise } from '../../api/flowiseClient'
 
 export function mountComposer(container: HTMLElement) {
     container.innerHTML = template
@@ -21,32 +20,11 @@ export function mountComposer(container: HTMLElement) {
             return
         }
 
-        dispatchStore('MESSAGE_ADDED', {
+        dispatchStore('USER_MESSAGE_SUBMITTED', {
             conversationId: 'default',
-            message: {
-                id: '1',
-                role: 'user',
-                content: value,
-                createdAt: Date.now()
-            }
+            content: value
         })
 
         inputElement.value = ''
-
-        try {
-            const response = await sendToFlowise(value)
-
-            dispatchStore('MESSAGE_ADDED', {
-                conversationId: 'default',
-                message: {
-                    id: response.chatMessageId,
-                    role: 'assistant',
-                    content: response.text,
-                    createdAt: Date.now()
-                }
-            })
-        } catch (error) {
-            console.error(error)
-        }
     })
 }
