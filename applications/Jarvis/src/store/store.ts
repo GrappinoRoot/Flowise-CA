@@ -6,16 +6,8 @@ import { runMiddlewares } from '../middleware/middleware'
 import { actions } from './actions'
 
 let state: AppState = {
-    conversations: [
-        {
-            Id: 'default',
-            title: 'Nuova Conversazione',
-            messages: [],
-            createdAt: Date.now(),
-            updatedAt: Date.now()
-        }
-    ],
-    activeConversationId: 'default',
+    conversations: [],
+    activeConversationId: null,
     loading: false
 }
 

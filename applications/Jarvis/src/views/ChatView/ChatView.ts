@@ -25,12 +25,28 @@ export function mountChatView(container: HTMLElement) {
 
     mountComposer(composerContainer)
 
+    const loadingElement = container.querySelector<HTMLElement>('[data-loading]')
+    if (!loadingElement) {
+        throw new Error('Loading element not found')
+    }
+    const loadingContainer = loadingElement
+
     function render() {
         const state = getState()
+        loadingContainer.innerHTML = state.loading ? '<div class="typing-indicator">Assistant is typing...</div>' : ''
 
-        const activeConversation = state.conversations.find((conversation) => conversation.Id === state.activeConversationId)
+        const activeConversation = state.activeConversationId
+            ? state.conversations.find((c) => c.Id === state.activeConversationId)
+            : undefined
 
         const messages = activeConversation?.messages ?? []
+        if (!activeConversation) {
+            messagesContainer.innerHTML = `
+            <div class="empty-state>
+            Start a new conversation
+            </div>
+            `
+        }
 
         messagesContainer.innerHTML = messages
             .map((message) => {
@@ -42,7 +58,6 @@ export function mountChatView(container: HTMLElement) {
             })
             .join('')
     }
-
     render()
 
     subscribe(() => {
