@@ -7,7 +7,6 @@ export const chatMiddleware: Middleware = (type, payload, context) => {
     switch (type) {
         case 'USER_MESSAGE_SUBMITTED': {
             const state = getState()
-            console.log('state:', state)
             let conversationId = state.activeConversationId
 
             const p = payload as { conversationId: string; content: string }

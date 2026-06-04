@@ -23,7 +23,6 @@ export function mountComposer(container: HTMLElement) {
         }
 
         dispatchStore('USER_MESSAGE_SUBMITTED', {
-            conversationId: 'default',
             content: value
         })
 

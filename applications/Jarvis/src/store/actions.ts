@@ -17,7 +17,7 @@ export type ActionPayloadMap = {
     MESSAGE_ADDED: { conversationId: string; message: ChatMessage }
     LOADING_STARTED: void
     LOADING_FINISHED: void
-    USER_MESSAGE_SUBMITTED: { conversationId: string; content: string }
+    USER_MESSAGE_SUBMITTED: { content: string }
 }
 
 export type ActionType = keyof ActionPayloadMap
