@@ -52,6 +52,16 @@ export function reducer(currentState: AppState, type: ActionType, payload: Actio
         case 'LOADING_FINISHED':
             return { ...currentState, loading: false }
 
+        case 'CONVERSATION_RENAMED': {
+            const renamePayload = payload as ActionPayloadMap['CONVERSATION_RENAMED']
+            return {
+                ...currentState,
+                conversations: currentState.conversations.map((c) =>
+                    c.Id === renamePayload.conversationId ? { ...c, title: renamePayload.title, updatedAt: Date.now() } : c
+                )
+            }
+        }
+
         default:
             return currentState
     }

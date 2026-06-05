@@ -6,10 +6,14 @@ import { getState } from '../store/store'
 export const chatMiddleware: Middleware = (type, payload, context) => {
     switch (type) {
         case 'USER_MESSAGE_SUBMITTED': {
-            const state = getState()
-            let conversationId = state.activeConversationId
-
             const p = payload as { conversationId: string; content: string }
+
+            // ----------------------------
+            // 1. RESOLVE CONVERSATION ID
+            // ----------------------------
+            const state = getState()
+
+            let conversationId = state.activeConversationId
 
             if (!conversationId) {
                 conversationId = crypto.randomUUID()
@@ -20,7 +24,18 @@ export const chatMiddleware: Middleware = (type, payload, context) => {
                 })
             }
 
-            // step 1: user message
+            // ----------------------------
+            // 2. CHECK FIRST MESSAGE (BEFORE USER MESSAGE DISPATCH)
+            // ----------------------------
+            const freshState = getState()
+
+            const conversation = freshState.conversations.find((c) => c.Id === conversationId)
+
+            const isFirstMessage = (conversation?.messages.length ?? 0) === 0
+
+            // ----------------------------
+            // 3. USER MESSAGE
+            // ----------------------------
             context.dispatch('MESSAGE_ADDED', {
                 conversationId,
                 message: {
@@ -31,9 +46,24 @@ export const chatMiddleware: Middleware = (type, payload, context) => {
                 }
             })
 
+            // ----------------------------
+            // 4. LOADING
+            // ----------------------------
             context.dispatch('LOADING_STARTED', undefined)
 
-            // step 2: async flowise call
+            // ----------------------------
+            // 5. RENAME CONVERSATION (FIRST MESSAGE ONLY)
+            // ----------------------------
+            if (isFirstMessage) {
+                context.dispatch('CONVERSATION_RENAMED', {
+                    conversationId,
+                    title: p.content.slice(0, 30)
+                })
+            }
+
+            // ----------------------------
+            // 6. ASYNC FLOWISE CALL
+            // ----------------------------
             void (async () => {
                 try {
                     const response = await sendToFlowise(p.content)
@@ -50,14 +80,12 @@ export const chatMiddleware: Middleware = (type, payload, context) => {
                 } catch (error) {
                     console.error(error)
 
-                    const message = ERRORS.FLOWISE_REQUEST_FAILED
-
                     context.dispatch('MESSAGE_ADDED', {
                         conversationId,
                         message: {
                             id: crypto.randomUUID(),
                             role: 'assistant',
-                            content: message,
+                            content: ERRORS.FLOWISE_REQUEST_FAILED,
                             createdAt: Date.now()
                         }
                     })
@@ -65,6 +93,7 @@ export const chatMiddleware: Middleware = (type, payload, context) => {
                     context.dispatch('LOADING_FINISHED', undefined)
                 }
             })()
+
             break
         }
     }

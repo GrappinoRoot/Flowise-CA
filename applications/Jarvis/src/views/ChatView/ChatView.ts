@@ -3,61 +3,71 @@ import './ChatView.css'
 import { subscribe } from '../../store/subscribers'
 import { getState } from '../../store/store'
 import { mountComposer } from '../../components/Composer/Composer'
+import { mountSidebar } from '../../components/Sidebar/Sidebar'
+import { getElement } from '../../utils/getElement'
 
 export function mountChatView(container: HTMLElement) {
     container.innerHTML = template
 
-    const messagesElement = container.querySelector<HTMLElement>('[data-messages]')
+    // ----------------------------
+    // DOM NODES
+    // ----------------------------
+    const messagesElement = getElement(container, '[data-messages]')
+    const composerElement = getElement(container, '[data-composer]')
+    const loadingElement = getElement(container, '[data-loading]')
+    const sidebarElement = getElement(container, '[data-sidebar]')
 
-    if (!messagesElement) {
-        throw new Error('Messages container not found')
+    // ----------------------------
+    // COMPOSER
+    // ----------------------------
+    mountComposer(composerElement)
+    mountSidebar(sidebarElement)
+
+    // ----------------------------
+    // RENDER HELPERS
+    // ----------------------------
+    function renderLoading(state: ReturnType<typeof getState>) {
+        loadingElement.innerHTML = state.loading ? '<div class="typing-indicator">Assistant is typing...</div>' : ''
     }
 
-    const messagesContainer = messagesElement
-
-    const composerElement = container.querySelector<HTMLElement>('[data-composer]')
-
-    if (!composerElement) {
-        throw new Error('Composer container not found')
-    }
-
-    const composerContainer = composerElement
-
-    mountComposer(composerContainer)
-
-    const loadingElement = container.querySelector<HTMLElement>('[data-loading]')
-    if (!loadingElement) {
-        throw new Error('Loading element not found')
-    }
-    const loadingContainer = loadingElement
-
-    function render() {
-        const state = getState()
-        loadingContainer.innerHTML = state.loading ? '<div class="typing-indicator">Assistant is typing...</div>' : ''
-
+    function renderMessages(state: ReturnType<typeof getState>) {
         const activeConversation = state.activeConversationId
             ? state.conversations.find((c) => c.Id === state.activeConversationId)
             : undefined
 
-        const messages = activeConversation?.messages ?? []
         if (!activeConversation) {
-            messagesContainer.innerHTML = `
-            <div class="empty-state>
-            Start a new conversation
-            </div>
+            messagesElement.innerHTML = `
+                <div class="empty-state">
+                    Start a new conversation
+                </div>
             `
+            return
         }
 
-        messagesContainer.innerHTML = messages
-            .map((message) => {
-                return `
-                    <div class="message ${message.role}">
-                        ${message.content}
-                    </div>
-                `
-            })
+        messagesElement.innerHTML = activeConversation.messages
+            .map(
+                (message) => `
+                <div class="message ${message.role}">
+                    ${message.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
+                </div>
+            `
+            )
             .join('')
     }
+
+    // ----------------------------
+    // MAIN RENDER
+    // ----------------------------
+    function render() {
+        const state = getState()
+
+        renderLoading(state)
+        renderMessages(state)
+    }
+
+    // ----------------------------
+    // INIT
+    // ----------------------------
     render()
 
     subscribe(() => {
