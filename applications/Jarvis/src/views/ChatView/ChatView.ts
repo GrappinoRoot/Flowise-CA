@@ -5,6 +5,7 @@ import { getState } from '../../store/store'
 import { mountComposer } from '../../components/Composer/Composer'
 import { mountSidebar } from '../../components/Sidebar/Sidebar'
 import { getElement } from '../../utils/getElement'
+import { createMessage } from '../../components/Message/Message'
 
 export function mountChatView(container: HTMLElement) {
     container.innerHTML = template
@@ -35,24 +36,24 @@ export function mountChatView(container: HTMLElement) {
             ? state.conversations.find((c) => c.Id === state.activeConversationId)
             : undefined
 
+        messagesElement.innerHTML = ''
+
         if (!activeConversation) {
-            messagesElement.innerHTML = `
-                <div class="empty-state">
-                    Start a new conversation
-                </div>
-            `
+            const empty = document.createElement('div')
+            empty.className = 'empty-state'
+            empty.textContent = 'Start new conversation'
+            messagesElement.appendChild(empty)
             return
         }
 
-        messagesElement.innerHTML = activeConversation.messages
-            .map(
-                (message) => `
-                <div class="message ${message.role}">
-                    ${message.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
-                </div>
-            `
+        for (const message of activeConversation.messages) {
+            messagesElement.appendChild(
+                createMessage({
+                    role: message.role,
+                    content: message.content
+                })
             )
-            .join('')
+        }
     }
 
     // ----------------------------

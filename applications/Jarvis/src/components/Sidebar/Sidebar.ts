@@ -5,6 +5,7 @@ import { subscribe } from '../../store/subscribers'
 import { getElement } from '../../utils/getElement'
 import { dispatchStore } from '../../store/store'
 import { createButton } from '../../components/Button/Button'
+import { createConversationItem } from '../../components/ConversationItem/ConversationItem'
 
 export function mountSidebar(container: HTMLElement) {
     container.innerHTML = template
@@ -46,12 +47,12 @@ export function mountSidebar(container: HTMLElement) {
         const state = getState()
 
         conversationsContainer.innerHTML = state.conversations
-            .map(
-                (c) => `
-                <div class="conversation ${c.Id === state.activeConversationId ? 'active' : ''}" data-id="${c.Id}">
-                    ${c.title.replace(/</g, '&lt;').replace(/>/g, '&gt;')}
-                </div>
-            `
+            .map((c) =>
+                createConversationItem({
+                    id: c.Id,
+                    title: c.title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+                    active: c.Id === state.activeConversationId
+                })
             )
             .join('')
     }
