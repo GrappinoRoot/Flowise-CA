@@ -9,3 +9,8 @@
 .button:hover {
     background: #f3f4f6;
 }
+
+.button-icon {
+    width: 18px;
+    height: 18px;
+}

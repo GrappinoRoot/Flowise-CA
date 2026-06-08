@@ -6,9 +6,17 @@ import { getElement } from '../../utils/getElement'
 import { dispatchStore } from '../../store/store'
 import { createButton } from '../../components/Button/Button'
 import { createConversationItem } from '../../components/ConversationItem/ConversationItem'
+import toggleIcon from '../../assets/toggle.svg'
 
 export function mountSidebar(container: HTMLElement) {
     container.innerHTML = template
+
+    let isCollapsed = false
+
+    function toggleSidebar() {
+        isCollapsed = !isCollapsed
+        container.classList.toggle('collapsed', isCollapsed)
+    }
 
     const conversationsContainer = getElement(container, '[data-conversations]')
     const headerContainer = getElement<HTMLDivElement>(container, '[data-sidebar-header]')
@@ -27,6 +35,16 @@ export function mountSidebar(container: HTMLElement) {
         className: 'button',
         onClick: handleNewChat
     })
+
+    const toggleBtn = createButton({
+        label: '',
+        icon: toggleIcon,
+        className: 'sidebar-toggle',
+        onClick: toggleSidebar
+    })
+
+    headerContainer.appendChild(newChatBtn)
+    headerContainer.appendChild(toggleBtn)
 
     // Attach listeners once (Event Delegation)
     conversationsContainer.addEventListener('click', (event) => {
@@ -64,4 +82,5 @@ export function mountSidebar(container: HTMLElement) {
     })
 
     headerContainer.appendChild(newChatBtn)
+    headerContainer.appendChild(toggleBtn)
 }

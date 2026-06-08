@@ -6,3 +6,7 @@
 .sidebar-header {
     padding: 4px;
 }
+
+.sidebar.collapsed {
+    width: 60px;
+}

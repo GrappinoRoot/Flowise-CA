@@ -6,6 +6,8 @@ import { mountComposer } from '../../components/Composer/Composer'
 import { mountSidebar } from '../../components/Sidebar/Sidebar'
 import { getElement } from '../../utils/getElement'
 import { createMessage } from '../../components/Message/Message'
+import { createLoading } from '../../components/Loading/Loading'
+import { createEmptyState } from '../../components/EmptyState/EmptyState'
 
 export function mountChatView(container: HTMLElement) {
     container.innerHTML = template
@@ -27,8 +29,12 @@ export function mountChatView(container: HTMLElement) {
     // ----------------------------
     // RENDER HELPERS
     // ----------------------------
+
     function renderLoading(state: ReturnType<typeof getState>) {
-        loadingElement.innerHTML = state.loading ? '<div class="typing-indicator">Assistant is typing...</div>' : ''
+        loadingElement.replaceChildren()
+
+        if (!state.loading) return
+        loadingElement.appendChild(createLoading())
     }
 
     function renderMessages(state: ReturnType<typeof getState>) {
@@ -36,13 +42,10 @@ export function mountChatView(container: HTMLElement) {
             ? state.conversations.find((c) => c.Id === state.activeConversationId)
             : undefined
 
-        messagesElement.innerHTML = ''
+        messagesElement.replaceChildren()
 
         if (!activeConversation) {
-            const empty = document.createElement('div')
-            empty.className = 'empty-state'
-            empty.textContent = 'Start new conversation'
-            messagesElement.appendChild(empty)
+            messagesElement.appendChild(createEmptyState())
             return
         }
 
