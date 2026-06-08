@@ -10,3 +10,9 @@
 .sidebar.collapsed {
     width: 60px;
 }
+
+.sidebar-toggle-container {
+    display: flex;
+    justify-content: flex-end;
+    margin: 4px;
+}

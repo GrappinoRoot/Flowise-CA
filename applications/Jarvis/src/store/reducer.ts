@@ -1,66 +1,25 @@
 import type { AppState } from '../types/chat'
 import type { ActionPayloadMap, ActionType } from './actions'
+import { createConversation, renameConversation, deleteConversation, selectConversation } from './reducersUtility/conversationReducer'
+import { addMessage } from './reducersUtility/messageReducer'
+import { startLoading, stopLoading } from './reducersUtility/uiReducer'
 
 export function reducer(currentState: AppState, type: ActionType, payload: ActionPayloadMap[ActionType]): AppState {
     switch (type) {
-        case 'CONVERSATION_CREATED': {
-            const p = payload as ActionPayloadMap['CONVERSATION_CREATED']
-
-            return {
-                ...currentState,
-                conversations: [
-                    ...currentState.conversations,
-                    {
-                        Id: p.Id,
-                        title: p.title,
-                        messages: [],
-                        createdAt: Date.now(),
-                        updatedAt: Date.now()
-                    }
-                ],
-                activeConversationId: p.Id
-            }
-        }
-
+        case 'CONVERSATION_CREATED':
+            return createConversation(currentState, payload as ActionPayloadMap['CONVERSATION_CREATED'])
         case 'CONVERSATION_SELECTED':
-            return {
-                ...currentState,
-                activeConversationId: (payload as ActionPayloadMap['CONVERSATION_SELECTED']).conversationId
-            }
-
+            return selectConversation(currentState, payload as ActionPayloadMap['CONVERSATION_SELECTED'])
         case 'MESSAGE_ADDED':
-            return {
-                ...currentState,
-                conversations: currentState.conversations.map((conversation) => {
-                    const messagePayload = payload as ActionPayloadMap['MESSAGE_ADDED']
-
-                    if (conversation.Id !== messagePayload.conversationId) {
-                        return conversation
-                    }
-
-                    return {
-                        ...conversation,
-                        messages: [...conversation.messages, messagePayload.message],
-                        updatedAt: Date.now()
-                    }
-                })
-            }
-
+            return addMessage(currentState, payload as ActionPayloadMap['MESSAGE_ADDED'])
         case 'LOADING_STARTED':
-            return { ...currentState, loading: true }
-
+            return startLoading(currentState)
         case 'LOADING_FINISHED':
-            return { ...currentState, loading: false }
-
-        case 'CONVERSATION_RENAMED': {
-            const renamePayload = payload as ActionPayloadMap['CONVERSATION_RENAMED']
-            return {
-                ...currentState,
-                conversations: currentState.conversations.map((c) =>
-                    c.Id === renamePayload.conversationId ? { ...c, title: renamePayload.title, updatedAt: Date.now() } : c
-                )
-            }
-        }
+            return stopLoading(currentState)
+        case 'CONVERSATION_RENAMED':
+            return renameConversation(currentState, payload as ActionPayloadMap['CONVERSATION_RENAMED'])
+        case 'CONVERSATION_DELETED':
+            return deleteConversation(currentState, payload as ActionPayloadMap['CONVERSATION_DELETED'])
 
         default:
             return currentState

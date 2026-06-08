@@ -1,0 +1,53 @@
+.conversation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.conversation.active {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.conversation-actions {
+    background-color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    opacity: 0.6;
+}
+
+.conversation-actions:hover {
+    opacity: 1;
+}
+
+.conversation-icon {
+    width: 14px;
+    height: 14px;
+    display: block;
+}
+
+.conversation-menu {
+    position: absolute;
+    right: 10px;
+    top: 35px;
+    background: rgba(49, 44, 41, 0.116);
+    border-radius: 6px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 10;
+}
+
+.conversation-menu-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.conversation-menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}

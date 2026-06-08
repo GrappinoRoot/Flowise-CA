@@ -19,6 +19,7 @@ export function mountSidebar(container: HTMLElement) {
     }
 
     const conversationsContainer = getElement(container, '[data-conversations]')
+    const toggleContainer = getElement<HTMLDivElement>(container, '[data-sidebar-toggle]')
     const headerContainer = getElement<HTMLDivElement>(container, '[data-sidebar-header]')
 
     function handleNewChat() {
@@ -44,7 +45,7 @@ export function mountSidebar(container: HTMLElement) {
     })
 
     headerContainer.appendChild(newChatBtn)
-    headerContainer.appendChild(toggleBtn)
+    toggleContainer.appendChild(toggleBtn)
 
     // Attach listeners once (Event Delegation)
     conversationsContainer.addEventListener('click', (event) => {
@@ -64,23 +65,20 @@ export function mountSidebar(container: HTMLElement) {
     function render() {
         const state = getState()
 
-        conversationsContainer.innerHTML = state.conversations
-            .map((c) =>
+        conversationsContainer.replaceChildren()
+        for (const conversation of state.conversations) {
+            conversationsContainer.appendChild(
                 createConversationItem({
-                    id: c.Id,
-                    title: c.title.replace(/</g, '&lt;').replace(/>/g, '&gt;'),
-                    active: c.Id === state.activeConversationId
+                    id: conversation.Id,
+                    title: conversation.title,
+                    active: conversation.Id === state.activeConversationId
                 })
             )
-            .join('')
+        }
     }
-
     render()
 
     subscribe(() => {
         render()
     })
-
-    headerContainer.appendChild(newChatBtn)
-    headerContainer.appendChild(toggleBtn)
 }
