@@ -2,17 +2,14 @@ import optionConversationIcon from '../../assets/optionConversation.svg'
 import './ConversationItem.css'
 import { dispatchStore } from '../../store/store'
 
-let isOpen = false
-
 type ConversationItemProps = {
     id: string
     title: string
     active: boolean
 }
 
-export function createConversationItem(props: ConversationItemProps): HTMLElement {
+function createUI(props: ConversationItemProps) {
     const wrapper = document.createElement('div')
-
     wrapper.className = `conversation ${props.active ? 'active' : ''}`
     wrapper.dataset.id = props.id
 
@@ -23,17 +20,32 @@ export function createConversationItem(props: ConversationItemProps): HTMLElemen
     actions.className = 'conversation-actions'
     actions.type = 'button'
 
-    actions.addEventListener('click', (e) => {
-        e.stopPropagation()
+    const icon = document.createElement('img')
+    icon.src = optionConversationIcon
+    icon.alt = 'actions'
+    icon.className = 'conversation-icon'
 
-        isOpen = !isOpen
-        menu.style.display = isOpen ? 'block' : 'none'
-    })
+    actions.appendChild(icon)
 
     const menu = document.createElement('div')
     menu.className = 'conversation-menu'
     menu.style.display = 'none'
 
+    wrapper.append(title, actions, menu)
+
+    return { wrapper, title, actions, menu }
+}
+
+function bindMenuToggle(actions: HTMLElement, menu: HTMLElement) {
+    actions.addEventListener('click', (e) => {
+        e.stopPropagation()
+
+        const open = menu.style.display === 'block'
+        menu.style.display = open ? 'none' : 'block'
+    })
+}
+
+function bindMenuActions(props: ConversationItemProps, menu: HTMLElement, wrapper: HTMLElement, titleEl: HTMLSpanElement) {
     const rename = document.createElement('div')
     rename.className = 'conversation-menu-item'
     rename.textContent = 'Rename'
@@ -41,16 +53,32 @@ export function createConversationItem(props: ConversationItemProps): HTMLElemen
     rename.addEventListener('click', (e) => {
         e.stopPropagation()
 
-        const title = window.prompt('Conversation name', props.title)
+        const input = document.createElement('input')
+        input.value = props.title
 
-        if (!title?.trim()) {
-            return
+        wrapper.replaceChild(input, titleEl)
+        menu.style.display = 'none'
+
+        const save = () => {
+            const value = input.value.trim()
+
+            if (!value) {
+                wrapper.replaceChild(titleEl, input)
+                return
+            }
+
+            dispatchStore('CONVERSATION_RENAMED', {
+                conversationId: props.id,
+                title: value
+            })
         }
 
-        dispatchStore('CONVERSATION_RENAMED', {
-            conversationId: props.id,
-            title: title.trim()
+        input.addEventListener('blur', save)
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') save()
         })
+
+        input.focus()
     })
 
     const remove = document.createElement('div')
@@ -65,16 +93,14 @@ export function createConversationItem(props: ConversationItemProps): HTMLElemen
         })
     })
 
-    const icon = document.createElement('img')
-    icon.src = optionConversationIcon
-    icon.alt = 'actions'
-    icon.className = 'conversation-icon'
+    menu.append(rename, remove)
+}
 
-    menu.appendChild(rename)
-    menu.appendChild(remove)
-    wrapper.appendChild(title)
-    wrapper.appendChild(actions)
-    wrapper.appendChild(menu)
-    actions.appendChild(icon)
+export function createConversationItem(props: ConversationItemProps): HTMLElement {
+    const { wrapper, title, actions, menu } = createUI(props)
+
+    bindMenuToggle(actions, menu)
+    bindMenuActions(props, menu, wrapper, title)
+
     return wrapper
 }
