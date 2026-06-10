@@ -10,6 +10,7 @@ export function createConversation(currentState: AppState, payload: ActionPayloa
                 Id: payload.Id,
                 title: payload.title,
                 messages: [],
+                flowiseChatId: null, // Inizializza flowiseChatId
                 createdAt: Date.now(),
                 updatedAt: Date.now()
             }

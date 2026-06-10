@@ -1,6 +1,7 @@
-const FLOWISE_BASE_URL = 'http://127.0.0.1:3000'
+import.meta.env
 
-const FLOWISE_CHATFLOW_ID = '538c0a79-f803-4399-a89c-1a61ec8f2995'
+const FLOWISE_BASE_URL = import.meta.env.VITE_FLOWISE_BASE_URL
+const FLOWISE_CHATFLOW_ID = import.meta.env.VITE_FLOWISE_CHATFLOW_ID
 
 export type FlowisePredictionResponse = {
     text: string

@@ -13,11 +13,17 @@ export type Conversation = {
     messages: ChatMessage[]
     createdAt: number
     updatedAt: number
-    flowiseChatId?: string
+    flowiseChatId?: string | null
 }
 
 export type AppState = {
     conversations: Conversation[]
     activeConversationId: string | null
     loading: boolean
+}
+
+export type NavbarProps = {
+    isAuthenticated: boolean
+    onNavigateAuth: () => void
+    onLogout: () => void
 }

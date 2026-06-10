@@ -1,100 +1,91 @@
-import type { Middleware } from './types'
+import type { ActionType, ActionPayloadMap } from '../store/actions'
+import type { MiddlewareContext } from './types'
 import { sendToFlowise } from '../api/flowiseClient'
-import { ERRORS } from '../utils/errors'
-import { getState } from '../store/store'
+import { createConversation, renameConversation, deleteConversation, updateFlowiseChatId } from '../services/conversationService'
+import { saveMessage } from '../services/messageService'
 
-export const chatMiddleware: Middleware = (type, payload, context) => {
+export const chatMiddleware = async (
+    type: ActionType,
+    payload: ActionPayloadMap[ActionType],
+    { dispatch, getState }: MiddlewareContext
+) => {
     switch (type) {
         case 'USER_MESSAGE_SUBMITTED': {
-            const p = payload as { conversationId: string; content: string }
-
-            // ----------------------------
-            // 1. RESOLVE CONVERSATION ID
-            // ----------------------------
+            const { content } = payload as ActionPayloadMap['USER_MESSAGE_SUBMITTED']
             const state = getState()
-
-            let conversationId = state.activeConversationId
+            const conversationId = state.activeConversationId
 
             if (!conversationId) {
-                conversationId = crypto.randomUUID()
-
-                context.dispatch('CONVERSATION_CREATED', {
-                    Id: conversationId,
-                    title: 'New Chat'
-                })
+                console.error('ERRORE: Impossibile inviare il messaggio. Nessuna conversazione attiva selezionata.') // Messaggio di errore consolidato
+                return
             }
 
-            // ----------------------------
-            // 2. CHECK FIRST MESSAGE (BEFORE USER MESSAGE DISPATCH)
-            // ----------------------------
-            const freshState = getState()
-
-            const conversation = freshState.conversations.find((c) => c.Id === conversationId)
-
-            const isFirstMessage = (conversation?.messages.length ?? 0) === 0
-
-            // ----------------------------
-            // 3. USER MESSAGE
-            // ----------------------------
-            context.dispatch('MESSAGE_ADDED', {
+            // Trasformiamo l'input in un messaggio concreto per la UI e il DB
+            dispatch('MESSAGE_ADDED', {
                 conversationId,
                 message: {
-                    id: crypto.randomUUID(),
+                    Id: crypto.randomUUID(),
+                    content,
                     role: 'user',
-                    content: p.content,
                     createdAt: Date.now()
                 }
             })
 
-            // ----------------------------
-            // 4. LOADING
-            // ----------------------------
-            context.dispatch('LOADING_STARTED', undefined)
+            // Avvia lo stato di caricamento per la UI
+            dispatch('LOADING_STARTED', undefined)
 
-            // ----------------------------
-            // 5. RENAME CONVERSATION (FIRST MESSAGE ONLY)
-            // ----------------------------
-            if (isFirstMessage) {
-                context.dispatch('CONVERSATION_RENAMED', {
-                    conversationId,
-                    title: p.content.slice(0, 30)
-                })
-            }
+            try {
+                // Trova la conversazione corrente per ottenere flowise_chat_id
+                const currentConversation = state.conversations.find((conv) => conv.Id === conversationId)
+                const flowiseChatId = currentConversation?.flowiseChatId
 
-            // ----------------------------
-            // 6. ASYNC FLOWISE CALL
-            // ----------------------------
-            void (async () => {
-                try {
-                    const response = await sendToFlowise(p.content)
+                // Utilizziamo il client dedicato per la chiamata a Flowise
+                const flowiseData = await sendToFlowise(content, flowiseChatId || undefined)
 
-                    context.dispatch('MESSAGE_ADDED', {
-                        conversationId,
-                        message: {
-                            id: crypto.randomUUID(),
-                            role: 'assistant',
-                            content: response.text ?? '',
-                            createdAt: Date.now()
-                        }
-                    })
-                } catch (error) {
-                    console.error(error)
+                const assistantResponseContent = flowiseData.text
 
-                    context.dispatch('MESSAGE_ADDED', {
-                        conversationId,
-                        message: {
-                            id: crypto.randomUUID(),
-                            role: 'assistant',
-                            content: ERRORS.FLOWISE_REQUEST_FAILED,
-                            createdAt: Date.now()
-                        }
-                    })
-                } finally {
-                    context.dispatch('LOADING_FINISHED', undefined)
+                const newFlowiseChatId = flowiseData.chatId
+
+                if (newFlowiseChatId && newFlowiseChatId !== flowiseChatId) {
+                    await updateFlowiseChatId(conversationId, newFlowiseChatId)
                 }
-            })()
 
+                // Dispatch del messaggio dell'assistente
+                dispatch('MESSAGE_ADDED', {
+                    conversationId,
+                    message: { Id: crypto.randomUUID(), content: assistantResponseContent, role: 'assistant', createdAt: Date.now() }
+                })
+            } catch (flowiseError) {
+                console.error("Errore durante la chiamata all'API Flowise:", flowiseError)
+                // Opzionalmente, puoi dispatchare un messaggio di errore alla UI
+            } finally {
+                // Termina lo stato di caricamento per la UI
+                dispatch('LOADING_FINISHED', undefined)
+            }
             break
         }
+
+        case 'CONVERSATION_CREATED': {
+            await createConversation(payload as ActionPayloadMap['CONVERSATION_CREATED'])
+            break
+        }
+
+        case 'MESSAGE_ADDED': {
+            await saveMessage(payload as ActionPayloadMap['MESSAGE_ADDED'])
+            break
+        }
+
+        case 'CONVERSATION_RENAMED': {
+            await renameConversation(payload as ActionPayloadMap['CONVERSATION_RENAMED'])
+            break
+        }
+
+        case 'CONVERSATION_DELETED': {
+            await deleteConversation(payload as ActionPayloadMap['CONVERSATION_DELETED'])
+            break
+        }
+
+        default:
+            break
     }
 }

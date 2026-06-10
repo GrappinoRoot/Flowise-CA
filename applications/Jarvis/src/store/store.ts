@@ -22,7 +22,8 @@ export function setState(newState: AppState) {
 
 export function dispatchStore<K extends ActionType>(type: K, payload: ActionPayloadMap[K]) {
     runMiddlewares(type, payload, {
-        dispatch: dispatchStore
+        dispatch: dispatchStore,
+        getState: getState
     })
 
     const action = actions[type]
