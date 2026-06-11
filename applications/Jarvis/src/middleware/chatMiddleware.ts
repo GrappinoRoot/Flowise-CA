@@ -4,14 +4,14 @@ import { sendToFlowise } from '../api/flowiseClient'
 import { createConversation, renameConversation, deleteConversation, updateFlowiseChatId } from '../services/conversationService'
 import { saveMessage } from '../services/messageService'
 
-export const chatMiddleware = async (
-    type: ActionType,
-    payload: ActionPayloadMap[ActionType],
+export const chatMiddleware = async <K extends ActionType>(
+    type: K,
+    payload: ActionPayloadMap[K],
     { dispatch, getState }: MiddlewareContext
 ) => {
     switch (type) {
         case 'USER_MESSAGE_SUBMITTED': {
-            const { content } = payload as ActionPayloadMap['USER_MESSAGE_SUBMITTED']
+            const { content } = payload
             const state = getState()
             const conversationId = state.activeConversationId
 
@@ -48,6 +48,11 @@ export const chatMiddleware = async (
 
                 if (newFlowiseChatId && newFlowiseChatId !== flowiseChatId) {
                     await updateFlowiseChatId(conversationId, newFlowiseChatId)
+                    // Sincronizziamo lo store locale con il nuovo ID ricevuto da Flowise
+                    dispatch('FLOWISE_CHAT_ID_UPDATED', {
+                        conversationId,
+                        flowiseChatId: newFlowiseChatId
+                    })
                 }
 
                 // Dispatch del messaggio dell'assistente
@@ -66,22 +71,22 @@ export const chatMiddleware = async (
         }
 
         case 'CONVERSATION_CREATED': {
-            await createConversation(payload as ActionPayloadMap['CONVERSATION_CREATED'])
+            await createConversation(payload)
             break
         }
 
         case 'MESSAGE_ADDED': {
-            await saveMessage(payload as ActionPayloadMap['MESSAGE_ADDED'])
+            await saveMessage(payload)
             break
         }
 
         case 'CONVERSATION_RENAMED': {
-            await renameConversation(payload as ActionPayloadMap['CONVERSATION_RENAMED'])
+            await renameConversation(payload)
             break
         }
 
         case 'CONVERSATION_DELETED': {
-            await deleteConversation(payload as ActionPayloadMap['CONVERSATION_DELETED'])
+            await deleteConversation(payload)
             break
         }
 

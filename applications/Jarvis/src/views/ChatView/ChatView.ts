@@ -8,6 +8,9 @@ import { getElement } from '../../utils/getElement'
 import { createMessage } from '../../components/Message/Message'
 import { createLoading } from '../../components/Loading/Loading'
 import { createEmptyState } from '../../components/EmptyState/EmptyState'
+import { mountNavbar } from '../../components/Navbar/Navbar'
+import { showAuthView } from '../../services/viewManager'
+import { signOut } from '../../services/authService'
 
 export function mountChatView(container: HTMLElement) {
     container.innerHTML = template
@@ -19,12 +22,22 @@ export function mountChatView(container: HTMLElement) {
     const composerElement = getElement(container, '[data-composer]')
     const loadingElement = getElement(container, '[data-loading]')
     const sidebarElement = getElement(container, '[data-sidebar]')
+    const navbarElement = getElement(container, '[data-navbar]')
 
     // ----------------------------
-    // COMPOSER
+    // COMPONENTS
     // ----------------------------
     mountComposer(composerElement)
     mountSidebar(sidebarElement)
+
+    mountNavbar(navbarElement, {
+        isAuthenticated: true,
+        onNavigateAuth: () => showAuthView(),
+        onLogout: async () => {
+            await signOut()
+            showAuthView()
+        }
+    })
 
     // ----------------------------
     // RENDER HELPERS
@@ -74,6 +87,8 @@ export function mountChatView(container: HTMLElement) {
     // ----------------------------
     render()
 
+    // NOTA: In un'app reale, subscribe dovrebbe ritornare una funzione di unsubscribe
+    // da chiamare quando la vista viene smontata per evitare memory leak.
     subscribe(() => {
         render()
     })

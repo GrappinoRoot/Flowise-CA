@@ -6,4 +6,4 @@ export type MiddlewareContext = {
     getState: () => AppState
 }
 
-export type Middleware = <K extends ActionType>(type: K, payload: ActionPayloadMap[K], context: MiddlewareContext) => void
+export type Middleware = <K extends ActionType>(type: K, payload: ActionPayloadMap[K], context: MiddlewareContext) => void | Promise<void>

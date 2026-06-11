@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabaseClient'
 import type { ActionPayloadMap } from '../store/actions'
 
 export async function saveMessage(payload: ActionPayloadMap['MESSAGE_ADDED']) {
-    const { conversationId, message } = payload as ActionPayloadMap['MESSAGE_ADDED']
+    const { conversationId, message } = payload
 
     const { error } = await supabase.from('messages').insert({
         id: message.Id,

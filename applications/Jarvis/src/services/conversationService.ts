@@ -18,7 +18,7 @@ export async function createConversation(payload: ActionPayloadMap['CONVERSATION
 }
 
 export async function renameConversation(payload: ActionPayloadMap['CONVERSATION_RENAMED']) {
-    const { conversationId, title } = payload as ActionPayloadMap['CONVERSATION_RENAMED']
+    const { conversationId, title } = payload
 
     const { error } = await supabase
         .from('conversations')
@@ -34,7 +34,7 @@ export async function renameConversation(payload: ActionPayloadMap['CONVERSATION
 }
 
 export async function deleteConversation(payload: ActionPayloadMap['CONVERSATION_DELETED']) {
-    const { conversationId } = payload as ActionPayloadMap['CONVERSATION_DELETED']
+    const { conversationId } = payload
 
     const { error } = await supabase.from('conversations').delete().eq('id', conversationId)
 

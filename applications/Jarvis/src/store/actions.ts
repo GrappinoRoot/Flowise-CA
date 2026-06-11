@@ -10,7 +10,8 @@ export const actions: {
     LOADING_FINISHED: { id: 4, process: () => undefined },
     USER_MESSAGE_SUBMITTED: { id: 5, process: (payload) => payload },
     CONVERSATION_RENAMED: { id: 6, process: (payload) => payload },
-    CONVERSATION_DELETED: { id: 7, process: (payload) => payload }
+    CONVERSATION_DELETED: { id: 7, process: (payload) => payload },
+    FLOWISE_CHAT_ID_UPDATED: { id: 8, process: (payload) => payload }
 }
 
 export type ActionPayloadMap = {
@@ -22,6 +23,7 @@ export type ActionPayloadMap = {
     USER_MESSAGE_SUBMITTED: { content: string }
     CONVERSATION_RENAMED: { conversationId: string; title: string }
     CONVERSATION_DELETED: { conversationId: string }
+    FLOWISE_CHAT_ID_UPDATED: { conversationId: string; flowiseChatId: string }
 }
 
 export type ActionType = keyof ActionPayloadMap

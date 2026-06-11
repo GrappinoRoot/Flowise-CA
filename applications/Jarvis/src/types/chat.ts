@@ -25,5 +25,5 @@ export type AppState = {
 export type NavbarProps = {
     isAuthenticated: boolean
     onNavigateAuth: () => void
-    onLogout: () => void
+    onLogout: () => Promise<void>
 }
