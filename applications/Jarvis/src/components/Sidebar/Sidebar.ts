@@ -39,10 +39,15 @@ export function mountSidebar(container: HTMLElement) {
 
     const toggleBtn = createButton({
         label: '',
-        icon: toggleIcon,
-        className: 'sidebar-toggle',
+        variant: 'ghost',
         onClick: toggleSidebar
     })
+
+    const icon = document.createElement('img')
+    icon.src = toggleIcon
+    icon.className = 'sidebar-toggle-icon'
+
+    toggleBtn.appendChild(icon)
 
     headerContainer.appendChild(newChatBtn)
     toggleContainer.appendChild(toggleBtn)

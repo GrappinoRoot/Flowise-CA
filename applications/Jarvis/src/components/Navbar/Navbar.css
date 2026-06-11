@@ -9,13 +9,6 @@
     font-family: system-ui, -apple-system, sans-serif;
 }
 
-.navbar__left .logo {
-    color: white;
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 0.3px;
-}
-
 .navbar__right {
     display: flex;
     gap: 10px;

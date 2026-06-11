@@ -33,7 +33,7 @@
     position: absolute;
     right: 10px;
     top: 35px;
-    background: rgba(49, 44, 41, 0.116);
+    background: rgb(160 72 255 / 64%);
     border-radius: 6px;
     padding: 6px;
     display: flex;

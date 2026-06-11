@@ -1,32 +1,40 @@
 import './Navbar.css'
 import template from './Navbar.html?raw'
 import type { NavbarProps } from '../../types/chat'
+import { createButton } from '../Button/Button' // Importa il componente Button
+import { getElement } from '../../utils/getElement' // Assicurati che getElement sia importato se usato nel template
 
 export function mountNavbar(container: HTMLElement, props: NavbarProps) {
     const wrapper = document.createElement('div')
     wrapper.innerHTML = template
 
-    const loginBtn = wrapper.querySelector('#loginBtn') as HTMLButtonElement
-    const signupBtn = wrapper.querySelector('#signupBtn') as HTMLButtonElement
-    const logoutBtn = wrapper.querySelector('#logoutBtn') as HTMLButtonElement
+    const actionsContainer = getElement(wrapper, '[data-actions]')
+    actionsContainer.replaceChildren() // Pulisce i pulsanti esistenti dal template HTML
+
+    // Crea i pulsanti usando il componente riutilizzabile
+    const loginBtn = createButton({
+        label: 'Login',
+        variant: 'ghost',
+        onClick: () => props.onNavigateAuth()
+    })
+    const signupBtn = createButton({
+        label: 'Sign up',
+        variant: 'primary',
+        onClick: () => props.onNavigateAuth()
+    })
+    const logoutBtn = createButton({
+        label: 'Logout',
+        variant: 'logout',
+        onClick: () => props.onLogout()
+    })
 
     // Gestione visibilità basata sull'autenticazione
     if (props.isAuthenticated) {
-        loginBtn.style.display = 'none'
-        signupBtn.style.display = 'none'
-        logoutBtn.style.display = 'block'
+        actionsContainer.appendChild(logoutBtn)
     } else {
-        loginBtn.style.display = 'block'
-        signupBtn.style.display = 'block'
-        logoutBtn.style.display = 'none'
+        actionsContainer.appendChild(loginBtn)
+        actionsContainer.appendChild(signupBtn)
     }
-
-    // Event Listeners
-    loginBtn.addEventListener('click', () => props.onNavigateAuth())
-    signupBtn.addEventListener('click', () => props.onNavigateAuth())
-    logoutBtn.addEventListener('click', () => {
-        props.onLogout()
-    })
 
     container.appendChild(wrapper)
 }

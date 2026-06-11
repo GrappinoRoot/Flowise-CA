@@ -1,18 +1,36 @@
 .sidebar {
     width: 280px;
     border-right: 1px solid #e5e7eb;
-}
-
-.sidebar-header {
-    padding: 4px;
+    transition: width 0.2s ease;
 }
 
 .sidebar.collapsed {
     width: 60px;
 }
 
+.sidebar-top {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 4px;
+}
+
 .sidebar-toggle-container {
     display: flex;
     justify-content: flex-end;
     margin: 4px;
+}
+
+.sidebar-toggle-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.logo {
+    color: rgba(255, 11, 11, 0.857);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.3px;
 }
