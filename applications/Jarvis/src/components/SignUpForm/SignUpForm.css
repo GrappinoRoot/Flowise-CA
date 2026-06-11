@@ -1,0 +1,31 @@
+.signup-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.signup-form input {
+    padding: 10px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #0b0f17;
+    color: white;
+}
+
+.primary-btn {
+    padding: 10px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.google-btn {
+    padding: 10px;
+    background: #111827;
+    color: white;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    cursor: pointer;
+}

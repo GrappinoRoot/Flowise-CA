@@ -1,4 +1,5 @@
 export type ChatRole = 'user' | 'assistant'
+export type AuthMode = 'signin' | 'signup'
 
 export type ChatMessage = {
     Id: string
@@ -30,7 +31,18 @@ export type NavbarProps = {
 
 export type ButtonType = 'button' | 'submit' | 'reset'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'success' | 'warning' | 'info' | 'light' | 'dark'
+export type ButtonVariant =
+    | 'primary'
+    | 'secondary'
+    | 'link'
+    | 'logout'
+    | 'danger'
+    | 'ghost'
+    | 'success'
+    | 'warning'
+    | 'info'
+    | 'light'
+    | 'dark'
 
 export type ButtonProps = {
     label: string

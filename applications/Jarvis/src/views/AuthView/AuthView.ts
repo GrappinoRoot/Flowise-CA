@@ -1,49 +1,40 @@
-import { supabase } from '../../lib/supabaseClient'
 import template from './AuthView.html?raw'
 import './AuthView.css'
-import { showChatView } from '../../services/viewManager'
 
-export async function mountAuthView(container: HTMLElement) {
+import { mountSignInForm } from '../../components/SignInForm/SignInForm'
+import { mountSignUpForm } from '../../components/SignUpForm/SignUpForm'
+
+type AuthMode = 'signin' | 'signup'
+
+export function mountAuthView(container: HTMLElement) {
     container.innerHTML = template
 
-    const emailInput = container.querySelector('#email') as HTMLInputElement
-    const passwordInput = container.querySelector('#password') as HTMLInputElement
+    const authFormElement = container.querySelector('[data-auth-form]') as HTMLDivElement
+    const subtitleElement = container.querySelector('[data-auth-subtitle]') as HTMLParagraphElement
+    const switchModeBtn = container.querySelector('[data-switch-mode]') as HTMLButtonElement
 
-    const loginBtn = container.querySelector('#loginBtn')!
-    const signupBtn = container.querySelector('#signupBtn')!
-    const googleBtn = container.querySelector('#googleBtn')!
+    let authMode: AuthMode = 'signin'
 
-    loginBtn.addEventListener('click', async () => {
-        const { error } = await supabase.auth.signInWithPassword({
-            email: emailInput.value,
-            password: passwordInput.value
-        })
+    function render() {
+        authFormElement.replaceChildren()
 
-        if (error) {
-            console.error(error)
-            return
+        if (authMode === 'signin') {
+            subtitleElement.textContent = 'Sign in to continue'
+            switchModeBtn.textContent = 'Create account'
+
+            mountSignInForm(authFormElement)
+        } else {
+            subtitleElement.textContent = 'Create your account'
+            switchModeBtn.textContent = 'Already have an account'
+
+            mountSignUpForm(authFormElement)
         }
+    }
 
-        showChatView()
+    switchModeBtn.addEventListener('click', () => {
+        authMode = authMode === 'signin' ? 'signup' : 'signin'
+        render()
     })
 
-    signupBtn.addEventListener('click', async () => {
-        const { error } = await supabase.auth.signUp({
-            email: emailInput.value,
-            password: passwordInput.value
-        })
-
-        if (error) console.error(error)
-    })
-
-    googleBtn.addEventListener('click', async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin
-            }
-        })
-
-        if (error) console.error(error)
-    })
+    render()
 }

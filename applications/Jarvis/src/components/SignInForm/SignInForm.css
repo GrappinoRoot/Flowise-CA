@@ -1,0 +1,56 @@
+.signin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.signin-form input {
+    padding: 10px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #0b0f17;
+    color: white;
+    outline: none;
+}
+
+.signin-form input:focus {
+    border-color: #3b82f6;
+}
+
+.primary-btn {
+    padding: 10px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.primary-btn:hover {
+    background: #2563eb;
+}
+
+.google-btn {
+    padding: 10px;
+    background: transparent;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.google-btn:hover {
+    background: #111827;
+}
+
+.divider {
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 12px;
+    min-height: 16px;
+}
