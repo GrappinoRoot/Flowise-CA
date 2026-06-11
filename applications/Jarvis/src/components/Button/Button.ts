@@ -1,33 +1,22 @@
 import './Button.css'
-
-type ButtonType = 'button' | 'submit' | 'reset'
-
-type ButtonProps = {
-    label: string
-    onClick?: () => void
-    type?: ButtonType
-    className?: string
-    icon?: string
-}
+import template from './Button.html?raw'
+import type { ButtonProps } from '../../types/chat'
+import { getElement } from '../../utils/getElement'
 
 export function createButton(props: ButtonProps): HTMLButtonElement {
-    const button = document.createElement('button')
+    const wrapper = document.createElement('div')
+    wrapper.innerHTML = template
+
+    const button = getElement<HTMLButtonElement>(wrapper, 'button')
 
     button.type = props.type ?? 'button'
-    button.className = props.className ?? ''
 
-    if (props.icon) {
-        const img = document.createElement('img')
-        img.src = props.icon
-        img.alt = 'icon'
-        img.className = 'button-icon'
-        button.appendChild(img)
-    }
+    const labelElement = getElement<HTMLSpanElement>(button, '[data-label]')
 
-    if (props.label) {
-        const span = document.createElement('span')
-        span.textContent = props.label
-        button.appendChild(span)
+    labelElement.textContent = props.label
+
+    if (props.variant) {
+        button.classList.add(`button--${props.variant}`)
     }
 
     if (props.onClick) {

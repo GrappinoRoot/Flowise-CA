@@ -27,3 +27,15 @@ export type NavbarProps = {
     onNavigateAuth: () => void
     onLogout: () => Promise<void>
 }
+
+export type ButtonType = 'button' | 'submit' | 'reset'
+
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'success' | 'warning' | 'info' | 'light' | 'dark'
+
+export type ButtonProps = {
+    label: string
+    onClick?: () => void
+    type?: ButtonType
+    variant?: ButtonVariant
+    className?: string
+}
