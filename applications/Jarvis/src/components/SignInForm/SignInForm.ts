@@ -2,6 +2,8 @@ import template from './SignInForm.html?raw'
 import './SignInForm.css'
 import { supabase } from '../../lib/supabaseClient'
 import { showChatView } from '../../services/viewManager'
+import { createButton } from '../Button/Button'
+import google from '../../assets/google.svg'
 
 export function mountSignInForm(container: HTMLElement) {
     container.innerHTML = template
@@ -10,7 +12,7 @@ export function mountSignInForm(container: HTMLElement) {
     const passwordInput = container.querySelector('[data-password]') as HTMLInputElement
 
     const loginBtn = container.querySelector('[data-login-btn]') as HTMLButtonElement
-    const googleBtn = container.querySelector('[data-google-btn]') as HTMLButtonElement
+    const googleContainer = container.querySelector('[data-google-btn]') as HTMLElement
 
     const errorBox = container.querySelector('[data-error]') as HTMLDivElement
 
@@ -42,16 +44,25 @@ export function mountSignInForm(container: HTMLElement) {
         showChatView()
     })
 
-    googleBtn.addEventListener('click', async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin
-            }
-        })
+    const googleBtn = createButton({
+        label: 'Continue with Google',
+        icon: google,
+        variant: 'secondary',
+        onClick: async () => {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            })
 
-        if (error) {
-            showError('Errore login Google')
+            if (error) {
+                showError('Errore login Google')
+            }
         }
     })
+
+    if (googleContainer) {
+        googleContainer.replaceWith(googleBtn)
+    }
 }

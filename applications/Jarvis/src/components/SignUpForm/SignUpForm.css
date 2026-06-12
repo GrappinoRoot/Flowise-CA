@@ -29,3 +29,7 @@
     border-radius: 6px;
     cursor: pointer;
 }
+
+.google-btn:hover {
+    background: #a73b3b;
+}

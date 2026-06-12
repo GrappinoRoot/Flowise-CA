@@ -30,7 +30,7 @@
 }
 
 .conversation-menu {
-    position: absolute;
+    position: relative;
     right: 10px;
     top: 35px;
     background: rgb(160 72 255 / 64%);

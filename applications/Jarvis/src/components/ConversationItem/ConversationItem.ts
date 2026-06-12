@@ -1,12 +1,7 @@
 import optionConversationIcon from '../../assets/optionConversation.svg'
 import './ConversationItem.css'
 import { dispatchStore } from '../../store/store'
-
-type ConversationItemProps = {
-    id: string
-    title: string
-    active: boolean
-}
+import type { ConversationItemProps } from '../../types/chat'
 
 function createUI(props: ConversationItemProps) {
     const wrapper = document.createElement('div')

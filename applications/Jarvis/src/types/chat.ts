@@ -50,4 +50,17 @@ export type ButtonProps = {
     type?: ButtonType
     variant?: ButtonVariant
     className?: string
+    icon?: string
+}
+
+export type IconProps = {
+    src: string
+    alt?: string
+    className?: string
+}
+
+export type ConversationItemProps = {
+    id: string
+    title: string
+    active: boolean
 }

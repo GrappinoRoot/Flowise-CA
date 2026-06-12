@@ -2,6 +2,8 @@ import template from './SignUpForm.html?raw'
 import './SignUpForm.css'
 import { supabase } from '../../lib/supabaseClient'
 import { showChatView } from '../../services/viewManager'
+import { createButton } from '../Button/Button'
+import google from '../../assets/google.svg'
 
 export function mountSignUpForm(container: HTMLElement) {
     container.innerHTML = template
@@ -16,7 +18,13 @@ export function mountSignUpForm(container: HTMLElement) {
 
     const signupBtn = container.querySelector('[data-signup-btn]') as HTMLButtonElement
 
-    const googleBtn = container.querySelector('[data-google-btn]') as HTMLButtonElement
+    const googleContainer = container.querySelector('[data-google-btn]') as HTMLElement
+
+    const errorBox = container.querySelector('[data-error]') as HTMLDivElement
+
+    function showError(message: string) {
+        errorBox.textContent = message
+    }
 
     signupBtn.addEventListener('click', async () => {
         if (passwordInput.value !== confirmPasswordInput.value) {
@@ -42,19 +50,25 @@ export function mountSignUpForm(container: HTMLElement) {
         showChatView()
     })
 
-    googleBtn.addEventListener('click', async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
-            provider: 'google',
-            options: {
-                redirectTo: window.location.origin
+    const googleBtn = createButton({
+        label: 'Continue with Google',
+        icon: google,
+        variant: 'secondary',
+        onClick: async () => {
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            })
+
+            if (error) {
+                showError('Errore login Google')
             }
-        })
-
-        if (error) {
-            console.error(error)
-            return
         }
-
-        showChatView()
     })
+
+    if (googleContainer) {
+        googleContainer.replaceWith(googleBtn)
+    }
 }

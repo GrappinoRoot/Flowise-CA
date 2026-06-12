@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #0b0f17;
+    background: #a9a8a9;
     font-family: system-ui, -apple-system, sans-serif;
 }
 
@@ -19,6 +19,7 @@
 .auth-header h1 {
     font-size: 18px;
     margin: 0;
+    color: #f25de3f0;
 }
 
 .auth-header p {
@@ -33,7 +34,7 @@
 }
 
 .auth-switch-btn {
-    background: transparent;
+    background: rgb(68, 68, 121);
     border: 1px solid #334155;
     color: #cbd5e1;
     padding: 8px 12px;
@@ -43,5 +44,6 @@
 }
 
 .auth-switch-btn:hover {
-    background: #1f2937;
+    background: #33b85d;
+    color: black;
 }
