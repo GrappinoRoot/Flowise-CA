@@ -15,6 +15,12 @@ export function mountAuthView(container: HTMLElement) {
 
     let authMode: AuthMode = 'signin'
 
+    // Funzione per passare alla modalità di accesso
+    const switchToSignIn = () => {
+        authMode = 'signin'
+        render()
+    }
+
     function render() {
         authFormElement.replaceChildren()
 
@@ -27,7 +33,8 @@ export function mountAuthView(container: HTMLElement) {
             subtitleElement.textContent = 'Create your account'
             switchModeBtn.textContent = 'Already have an account'
 
-            mountSignUpForm(authFormElement)
+            // Passa la funzione switchToSignIn al mountSignUpForm
+            mountSignUpForm(authFormElement, switchToSignIn)
         }
     }
 

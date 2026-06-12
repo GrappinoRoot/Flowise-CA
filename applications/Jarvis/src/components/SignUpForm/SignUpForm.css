@@ -1,35 +1,47 @@
 .signup-form {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .signup-form input {
-    padding: 10px;
-    border: 1px solid #334155;
+    padding: 12px;
+    border: 1px solid #7f8c8d; /* Grigio medio per i bordi */
     border-radius: 6px;
-    background: #0b0f17;
-    color: white;
+    background: #2c3e50; /* Blu scuro/Antracite base */
+    color: #ecf0f1; /* Testo chiaro per leggibilità */
+    font-size: 0.95rem;
+    transition: border-color 0.3s ease;
+}
+
+.signup-form input:focus {
+    outline: none;
+    border-color: #2ecc71; /* Verde smeraldo in focus */
 }
 
 .primary-btn {
-    padding: 10px;
-    background: #3b82f6;
-    color: white;
+    padding: 12px;
+    background: #2ecc71; /* Verde smeraldo accattivante */
+    color: #2c3e50; /* Testo scuro su fondo chiaro per contrasto */
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    transition: filter 0.2s, transform 0.1s;
 }
 
-.google-btn {
-    padding: 10px;
-    background: #111827;
-    color: white;
-    border: 1px solid #334155;
-    border-radius: 6px;
-    cursor: pointer;
+.primary-btn:hover {
+    filter: brightness(1.1);
 }
 
-.google-btn:hover {
-    background: #a73b3b;
+.primary-btn:active {
+    transform: scale(0.98);
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    text-align: center;
 }
