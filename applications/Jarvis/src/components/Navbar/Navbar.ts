@@ -1,7 +1,7 @@
 import './Navbar.css'
 import template from './Navbar.html?raw'
 import type { NavbarProps } from '../../types/chat'
-import { createButton } from '../Button/Button' // Importa il componente Button
+import { Button } from '../Button/Button' // Importa il componente Button
 import { getElement } from '../../utils/getElement' // Assicurati che getElement sia importato se usato nel template
 
 export function mountNavbar(container: HTMLElement, props: NavbarProps) {
@@ -12,21 +12,21 @@ export function mountNavbar(container: HTMLElement, props: NavbarProps) {
     actionsContainer.replaceChildren() // Pulisce i pulsanti esistenti dal template HTML
 
     // Crea i pulsanti usando il componente riutilizzabile
-    const loginBtn = createButton({
+    const loginBtn = new Button({
         label: 'Login',
         variant: 'ghost',
         onClick: () => props.onNavigateAuth()
-    })
-    const signupBtn = createButton({
+    }).render()
+    const signupBtn = new Button({
         label: 'Sign up',
         variant: 'primary',
         onClick: () => props.onNavigateAuth()
-    })
-    const logoutBtn = createButton({
+    }).render()
+    const logoutBtn = new Button({
         label: 'Logout',
         variant: 'logout',
         onClick: () => props.onLogout()
-    })
+    }).render()
 
     // Gestione visibilità basata sull'autenticazione
     if (props.isAuthenticated) {

@@ -2,25 +2,20 @@ import template from './SignUpForm.html?raw'
 import './SignUpForm.css'
 import { supabase } from '../../lib/supabaseClient'
 import { showChatView } from '../../services/viewManager'
-import { createButton } from '../Button/Button'
+import { Button } from '../Button/Button'
 import google from '../../assets/google.svg'
+import { getElement } from '../../utils/getElement'
 
 export function mountSignUpForm(container: HTMLElement, onSwitchToSignIn?: () => void) {
     container.innerHTML = template
 
-    const usernameInput = container.querySelector('[data-username]') as HTMLInputElement
-
-    const emailInput = container.querySelector('[data-email]') as HTMLInputElement
-
-    const passwordInput = container.querySelector('[data-password]') as HTMLInputElement
-
-    const confirmPasswordInput = container.querySelector('[data-confirm-password]') as HTMLInputElement
-
-    const signupBtn = container.querySelector('[data-signup-btn]') as HTMLButtonElement
-
-    const googleContainer = container.querySelector('[data-google-btn]') as HTMLElement
-
-    const errorBox = container.querySelector('[data-error]') as HTMLDivElement
+    const usernameInput = getElement<HTMLInputElement>(container, '[data-username]')
+    const emailInput = getElement<HTMLInputElement>(container, '[data-email]')
+    const passwordInput = getElement<HTMLInputElement>(container, '[data-password]')
+    const confirmPasswordInput = getElement<HTMLInputElement>(container, '[data-confirm-password]')
+    const signupBtn = getElement<HTMLButtonElement>(container, '[data-signup-btn]')
+    const googleContainer = getElement<HTMLElement>(container, '[data-google-btn]')
+    const errorBox = getElement<HTMLDivElement>(container, '[data-error]')
 
     function showError(message: string) {
         errorBox.textContent = message
@@ -63,7 +58,7 @@ export function mountSignUpForm(container: HTMLElement, onSwitchToSignIn?: () =>
         showChatView()
     })
 
-    const googleBtn = createButton({
+    const googleBtn = new Button({
         label: 'Continue with Google',
         icon: google,
         variant: 'secondary',
@@ -79,7 +74,7 @@ export function mountSignUpForm(container: HTMLElement, onSwitchToSignIn?: () =>
                 showError('Errore login Google')
             }
         }
-    })
+    }).render()
 
     if (googleContainer) {
         googleContainer.replaceWith(googleBtn)

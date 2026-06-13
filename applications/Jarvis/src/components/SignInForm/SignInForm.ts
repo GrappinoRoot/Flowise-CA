@@ -2,19 +2,20 @@ import template from './SignInForm.html?raw'
 import './SignInForm.css'
 import { supabase } from '../../lib/supabaseClient'
 import { showChatView } from '../../services/viewManager'
-import { createButton } from '../Button/Button'
+import { Button } from '../Button/Button'
 import google from '../../assets/google.svg'
+import { getElement } from '../../utils/getElement'
 
 export function mountSignInForm(container: HTMLElement) {
     container.innerHTML = template
 
-    const emailInput = container.querySelector('[data-email]') as HTMLInputElement
-    const passwordInput = container.querySelector('[data-password]') as HTMLInputElement
+    const emailInput = getElement<HTMLInputElement>(container, '[data-email]')
+    const passwordInput = getElement<HTMLInputElement>(container, '[data-password]')
+    const loginBtn = getElement<HTMLButtonElement>(container, '[data-login-btn]')
+    const googleContainer = getElement<HTMLElement>(container, '[data-google-btn]')
+    const errorBox = getElement<HTMLDivElement>(container, '[data-error]')
 
-    const loginBtn = container.querySelector('[data-login-btn]') as HTMLButtonElement
-    const googleContainer = container.querySelector('[data-google-btn]') as HTMLElement
-
-    const errorBox = container.querySelector('[data-error]') as HTMLDivElement
+    // const'[data-error]') as HTMLDivElement
 
     function showError(message: string) {
         errorBox.textContent = message
@@ -44,7 +45,7 @@ export function mountSignInForm(container: HTMLElement) {
         showChatView()
     })
 
-    const googleBtn = createButton({
+    const googleBtn = new Button({
         label: 'Continue with Google',
         icon: google,
         variant: 'secondary',
@@ -60,7 +61,7 @@ export function mountSignInForm(container: HTMLElement) {
                 showError('Errore login Google')
             }
         }
-    })
+    }).render()
 
     if (googleContainer) {
         googleContainer.replaceWith(googleBtn)

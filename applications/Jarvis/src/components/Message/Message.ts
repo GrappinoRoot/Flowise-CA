@@ -1,18 +1,30 @@
+import template from './Message.html?raw'
+import './Message.css'
 import type { ChatRole } from '../../types/chat'
+import { getElement } from '../../utils/getElement'
 
 type MessageProps = {
     role: ChatRole
     content: string
 }
 
-export function createMessage(props: MessageProps): HTMLElement {
-    const wrapper = document.createElement('div')
+export class Message {
+    private element: HTMLElement
 
-    wrapper.className = `message ${props.role}`
-    const text = document.createElement('span')
-    text.textContent = props.content
+    constructor(private props: MessageProps) {
+        const wrapper = document.createElement('div')
+        wrapper.innerHTML = template
 
-    wrapper.appendChild(text)
+        const root = getElement<HTMLElement>(wrapper, '[data-root]')
 
-    return wrapper
+        root.classList.add(this.props.role)
+
+        const contentEL = getElement<HTMLSpanElement>(wrapper, '[data-content]')
+        contentEL.textContent = this.props.content
+
+        this.element = root
+    }
+    render(): HTMLElement {
+        return this.element
+    }
 }

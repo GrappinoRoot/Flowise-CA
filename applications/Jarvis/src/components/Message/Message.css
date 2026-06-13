@@ -1,0 +1,17 @@
+.message {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background: #2b2d31;
+    margin-left: auto;
+}
+
+.message.assistant {
+    background: #1f2937;
+    margin-right: auto;
+}

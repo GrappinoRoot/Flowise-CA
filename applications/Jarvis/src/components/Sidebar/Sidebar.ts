@@ -4,8 +4,8 @@ import { getState } from '../../store/store'
 import { subscribe } from '../../store/subscribers'
 import { getElement } from '../../utils/getElement'
 import { dispatchStore } from '../../store/store'
-import { createButton } from '../../components/Button/Button'
-import { createConversationItem } from '../../components/ConversationItem/ConversationItem'
+import { Button } from '../../components/Button/Button'
+import { ConversationItem } from '../../components/ConversationItem/ConversationItem'
 import toggleIcon from '../../assets/toggle.svg'
 
 export function mountSidebar(container: HTMLElement) {
@@ -23,34 +23,29 @@ export function mountSidebar(container: HTMLElement) {
     const headerContainer = getElement<HTMLDivElement>(container, '[data-sidebar-header]')
 
     function handleNewChat() {
-        const Id = crypto.randomUUID()
+        const conversationId = crypto.randomUUID()
 
         dispatchStore('CONVERSATION_CREATED', {
-            Id,
+            Id: conversationId,
             title: 'New Chat'
         })
     }
 
-    const newChatBtn = createButton({
+    const newChatBtn = new Button({
         label: 'New Chat',
-        className: 'button',
+        variant: 'secondary',
         onClick: handleNewChat
     })
 
-    const toggleBtn = createButton({
+    const toggleBtn = new Button({
         label: '',
+        icon: toggleIcon,
         variant: 'ghost',
         onClick: toggleSidebar
     })
 
-    const icon = document.createElement('img')
-    icon.src = toggleIcon
-    icon.className = 'sidebar-toggle-icon'
-
-    toggleBtn.appendChild(icon)
-
-    headerContainer.appendChild(newChatBtn)
-    toggleContainer.appendChild(toggleBtn)
+    headerContainer.prepend(newChatBtn.render())
+    toggleContainer.prepend(toggleBtn.render())
 
     // Attach listeners once (Event Delegation)
     conversationsContainer.addEventListener('click', (event) => {
@@ -71,14 +66,15 @@ export function mountSidebar(container: HTMLElement) {
         const state = getState()
 
         conversationsContainer.replaceChildren()
+
         for (const conversation of state.conversations) {
-            conversationsContainer.appendChild(
-                createConversationItem({
-                    id: conversation.Id,
-                    title: conversation.title,
-                    active: conversation.Id === state.activeConversationId
-                })
-            )
+            const item = new ConversationItem({
+                id: conversation.Id,
+                title: conversation.title,
+                active: conversation.Id === state.activeConversationId
+            })
+
+            conversationsContainer.appendChild(item.render())
         }
     }
     render()

@@ -5,7 +5,7 @@ import { getState } from '../../store/store'
 import { mountComposer } from '../../components/Composer/Composer'
 import { mountSidebar } from '../../components/Sidebar/Sidebar'
 import { getElement } from '../../utils/getElement'
-import { createMessage } from '../../components/Message/Message'
+import { Message } from '../../components/Message/Message'
 import { createLoading } from '../../components/Loading/Loading'
 import { createEmptyState } from '../../components/EmptyState/EmptyState'
 import { mountNavbar } from '../../components/Navbar/Navbar'
@@ -62,13 +62,13 @@ export function mountChatView(container: HTMLElement) {
             return
         }
 
-        for (const message of activeConversation.messages) {
-            messagesElement.appendChild(
-                createMessage({
-                    role: message.role,
-                    content: message.content
-                })
-            )
+        for (const msg of activeConversation.messages) {
+            const message = new Message({
+                role: msg.role,
+                content: msg.content
+            })
+
+            messagesElement.appendChild(message.render())
         }
     }
 

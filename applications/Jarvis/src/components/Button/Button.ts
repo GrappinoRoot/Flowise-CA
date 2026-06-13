@@ -2,35 +2,42 @@ import './Button.css'
 import template from './Button.html?raw'
 import type { ButtonProps } from '../../types/chat'
 import { getElement } from '../../utils/getElement'
-import { createIcon } from '../Icon/Icon'
+import { Icon } from '../Icon/Icon'
 
-export function createButton(props: ButtonProps): HTMLButtonElement {
-    const wrapper = document.createElement('div')
-    wrapper.innerHTML = template
+export class Button {
+    private element: HTMLButtonElement
 
-    const button = getElement<HTMLButtonElement>(wrapper, 'button')
+    constructor(private props: ButtonProps) {
+        const wrapper = document.createElement('div')
+        wrapper.innerHTML = template
 
-    button.type = props.type ?? 'button'
+        const button = getElement<HTMLButtonElement>(wrapper, 'button')
+        button.type = this.props.type ?? 'button'
 
-    const labelElement = getElement<HTMLSpanElement>(button, '[data-label]')
-    labelElement.textContent = props.label ?? ''
+        const labelElement = getElement<HTMLSpanElement>(button, '[data-label]')
+        labelElement.textContent = this.props.label ?? ''
 
-    if (props.icon) {
-        const icon = createIcon({
-            src: props.icon,
-            alt: props.label
-        })
+        if (this.props.icon) {
+            const icon = new Icon({
+                src: this.props.icon,
+                alt: this.props.label,
+                className: 'button-icon'
+            })
 
-        button.prepend(icon)
+            button.prepend(icon.render())
+        }
+
+        if (props.variant) {
+            button.classList.add(`button--${props.variant}`)
+        }
+
+        if (props.onClick) {
+            button.addEventListener('click', props.onClick)
+        }
+        this.element = button
     }
 
-    if (props.variant) {
-        button.classList.add(`button--${props.variant}`)
+    render(): HTMLButtonElement {
+        return this.element
     }
-
-    if (props.onClick) {
-        button.addEventListener('click', props.onClick)
-    }
-
-    return button
 }

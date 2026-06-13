@@ -1,101 +1,97 @@
-import optionConversationIcon from '../../assets/optionConversation.svg'
+import template from './ConversationItem.html?raw'
 import './ConversationItem.css'
+import optionConversationIcon from '../../assets/optionConversation.svg'
+import { getElement } from '../../utils/getElement'
 import { dispatchStore } from '../../store/store'
 import type { ConversationItemProps } from '../../types/chat'
 
-function createUI(props: ConversationItemProps) {
-    const wrapper = document.createElement('div')
-    wrapper.className = `conversation ${props.active ? 'active' : ''}`
-    wrapper.dataset.id = props.id
+export class ConversationItem {
+    private element: HTMLElement
 
-    const title = document.createElement('span')
-    title.textContent = props.title
+    private titleEl: HTMLSpanElement
+    private actionsEl: HTMLButtonElement
+    private menuEl: HTMLDivElement
 
-    const actions = document.createElement('button')
-    actions.className = 'conversation-actions'
-    actions.type = 'button'
+    constructor(private props: ConversationItemProps) {
+        const wrapper = document.createElement('div')
+        wrapper.innerHTML = template
 
-    const icon = document.createElement('img')
-    icon.src = optionConversationIcon
-    icon.alt = 'actions'
-    icon.className = 'conversation-icon'
+        const root = getElement<HTMLElement>(wrapper, '[data-root]')
+        root.classList.toggle('active', props.active)
+        root.dataset.id = props.id
 
-    actions.appendChild(icon)
+        const iconEl = getElement<HTMLImageElement>(root, '[data-icon]')
+        iconEl.src = optionConversationIcon
 
-    const menu = document.createElement('div')
-    menu.className = 'conversation-menu'
-    menu.style.display = 'none'
+        this.titleEl = getElement(root, '[data-title]')
+        this.actionsEl = getElement(root, '[data-actions]')
+        this.menuEl = getElement(root, '[data-menu]')
 
-    wrapper.append(title, actions, menu)
+        this.titleEl.textContent = props.title
 
-    return { wrapper, title, actions, menu }
-}
+        this.actionsEl.addEventListener('click', (e) => {
+            e.stopPropagation()
+            this.openMenu()
+        })
+        this.buildMenu()
+        this.element = root
+    }
 
-function bindMenuToggle(actions: HTMLElement, menu: HTMLElement) {
-    actions.addEventListener('click', (e) => {
-        e.stopPropagation()
+    private openMenu() {
+        this.menuEl.classList.toggle('conversation-menu-open')
+    }
 
-        const open = menu.style.display === 'block'
-        menu.style.display = open ? 'none' : 'block'
-    })
-}
+    private buildMenu() {
+        const rename = document.createElement('div')
+        rename.className = 'conversation-menu-item'
+        rename.textContent = 'Rename'
 
-function bindMenuActions(props: ConversationItemProps, menu: HTMLElement, wrapper: HTMLElement, titleEl: HTMLSpanElement) {
-    const rename = document.createElement('div')
-    rename.className = 'conversation-menu-item'
-    rename.textContent = 'Rename'
+        rename.addEventListener('click', (e) => {
+            e.stopPropagation()
 
-    rename.addEventListener('click', (e) => {
-        e.stopPropagation()
+            const input = document.createElement('input')
+            input.value = this.props.title
 
-        const input = document.createElement('input')
-        input.value = props.title
+            this.element.replaceChild(input, this.titleEl)
 
-        wrapper.replaceChild(input, titleEl)
-        menu.style.display = 'none'
+            const save = () => {
+                const value = input.value.trim()
 
-        const save = () => {
-            const value = input.value.trim()
+                if (!value) {
+                    this.element.replaceChild(this.titleEl, input)
+                    return
+                }
 
-            if (!value) {
-                wrapper.replaceChild(titleEl, input)
-                return
+                dispatchStore('CONVERSATION_RENAMED', {
+                    conversationId: this.props.id,
+                    title: value
+                })
             }
 
-            dispatchStore('CONVERSATION_RENAMED', {
-                conversationId: props.id,
-                title: value
+            input.addEventListener('blur', save)
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') save()
             })
-        }
 
-        input.addEventListener('blur', save)
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') save()
+            input.focus()
         })
 
-        input.focus()
-    })
+        const remove = document.createElement('div')
+        remove.className = 'conversation-menu-item'
+        remove.textContent = 'Remove'
 
-    const remove = document.createElement('div')
-    remove.className = 'conversation-menu-item'
-    remove.textContent = 'Remove'
+        remove.addEventListener('click', (e) => {
+            e.stopPropagation()
 
-    remove.addEventListener('click', (e) => {
-        e.stopPropagation()
-
-        dispatchStore('CONVERSATION_DELETED', {
-            conversationId: props.id
+            dispatchStore('CONVERSATION_DELETED', {
+                conversationId: this.props.id
+            })
         })
-    })
 
-    menu.append(rename, remove)
-}
+        this.menuEl.append(rename, remove)
+    }
 
-export function createConversationItem(props: ConversationItemProps): HTMLElement {
-    const { wrapper, title, actions, menu } = createUI(props)
-
-    bindMenuToggle(actions, menu)
-    bindMenuActions(props, menu, wrapper, title)
-
-    return wrapper
+    render(): HTMLElement {
+        return this.element
+    }
 }

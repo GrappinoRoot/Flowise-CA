@@ -2,7 +2,7 @@ import template from './Composer.html?raw'
 import './Composer.css'
 import { dispatchStore } from '../../store/store'
 import { getElement } from '../../utils/getElement'
-import { createButton } from '../../components/Button/Button'
+import { Button } from '../../components/Button/Button'
 
 export function mountComposer(container: HTMLElement) {
     container.innerHTML = template
@@ -11,12 +11,12 @@ export function mountComposer(container: HTMLElement) {
     const inputElement = getElement<HTMLInputElement>(container, '[data-composer-input]')
     const submitButtonContainer = getElement<HTMLDivElement>(container, '[data-submit-button]')
 
-    const submitButton = createButton({
+    const submitButton = new Button({
         label: 'Invia',
         type: 'submit',
-        className: 'button'
+        variant: 'primary'
     })
-    submitButtonContainer.appendChild(submitButton)
+    submitButtonContainer.prepend(submitButton.render())
 
     formElement.addEventListener('submit', (event) => {
         event.preventDefault()

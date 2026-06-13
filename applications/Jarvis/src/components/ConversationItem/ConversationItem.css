@@ -30,6 +30,10 @@
 }
 
 .conversation-menu {
+    display: none;
+}
+
+.conversation-menu-open {
     position: relative;
     right: 10px;
     top: 35px;
